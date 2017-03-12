@@ -12,86 +12,86 @@ public interface Address {
 	static final String NOT_SUPPORTED = "Method not supported for %s addresses";
 
 	// Canada
-	default public int getStreetNumber() {
+	default int getStreetNumber() {
 		throw new UnsupportedOperationException(String.format(NOT_SUPPORTED, getType()));
 	}
 
-	default public void setStreetNumber(int streetNumber) {
+	default void setStreetNumber(int streetNumber) {
 		throw new UnsupportedOperationException(String.format(NOT_SUPPORTED, getType()));
 	}
 
-	default public String getStreetName() {
+	default String getStreetName() {
 		throw new UnsupportedOperationException(String.format(NOT_SUPPORTED, getType()));
 	}
 
-	default public void setStreetName(String streetName) {
+	default void setStreetName(String streetName) {
 		throw new UnsupportedOperationException(String.format(NOT_SUPPORTED, getType()));
 	}
 
-	default public Province getProvince() {
+	default Province getProvince() {
 		throw new UnsupportedOperationException(String.format(NOT_SUPPORTED, getType()));
 	}
 
-	default public void setProvince(Province province) {
+	default void setProvince(Province province) {
 		throw new UnsupportedOperationException(String.format(NOT_SUPPORTED, getType()));
 	}
 
-	default public String getPostalCode() {
+	default String getPostalCode() {
 		throw new UnsupportedOperationException(String.format(NOT_SUPPORTED, getType()));
 	}
 
-	default public void setPostalCode(String postalCode) {
+	default void setPostalCode(String postalCode) {
 		throw new UnsupportedOperationException(String.format(NOT_SUPPORTED, getType()));
 	}
 
 	// USA
-	default public String getAddress() {
+	default String getAddress() {
 		throw new UnsupportedOperationException(String.format(NOT_SUPPORTED, getType()));
 	}
 
-	default public void setAddress(String address) {
+	default void setAddress(String address) {
 		throw new UnsupportedOperationException(String.format(NOT_SUPPORTED, getType()));
 	}
 
-	default public State getState() {
+	default State getState() {
 		throw new UnsupportedOperationException(String.format(NOT_SUPPORTED, getType()));
 	}
 
-	default public void setState(State state) {
+	default void setState(State state) {
 		throw new UnsupportedOperationException(String.format(NOT_SUPPORTED, getType()));
 	}
 
-	default public int getZipCode() {
+	default int getZipCode() {
 		throw new UnsupportedOperationException(String.format(NOT_SUPPORTED, getType()));
 	}
 
-	default public void setZipCode(int zipCode) {
+	default void setZipCode(int zipCode) {
 		throw new UnsupportedOperationException(String.format(NOT_SUPPORTED, getType()));
 	}
 
 	// Other countries
-	default public List<String> getLines() {
+	default List<String> getLines() {
 		throw new UnsupportedOperationException(String.format(NOT_SUPPORTED, getType()));
 	}
 
-	default public void setLines(List<String> lines) {
+	default void setLines(List<String> lines) {
 		throw new UnsupportedOperationException(String.format(NOT_SUPPORTED, getType()));
 	}
 
 	// Shared
-	default public String getCity() {
+	default String getCity() {
 		throw new UnsupportedOperationException(String.format(NOT_SUPPORTED, getType()));
 	}
 
-	default public void setCity(String city) {
+	default void setCity(String city) {
 		throw new UnsupportedOperationException(String.format(NOT_SUPPORTED, getType()));
 	}
 
-	default public String getCountry() {
+	default String getCountry() {
 		throw new UnsupportedOperationException(String.format(NOT_SUPPORTED, getType()));
 	}
 
-	default public void setCountry(String country) {
+	default void setCountry(String country) {
 		throw new UnsupportedOperationException(String.format(NOT_SUPPORTED, getType()));
 	}
 
