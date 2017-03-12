@@ -1,8 +1,9 @@
 package model;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import model.enums.Country;
+import model.enums.AddressType;
 import model.enums.Province;
 import model.enums.State;
 
@@ -12,86 +13,94 @@ public interface Address {
 
 	// Canada
 	default public int getStreetNumber() {
-		throw new UnsupportedOperationException(String.format(NOT_SUPPORTED, getCountry()));
+		throw new UnsupportedOperationException(String.format(NOT_SUPPORTED, getType()));
 	}
 
 	default public void setStreetNumber(int streetNumber) {
-		throw new UnsupportedOperationException(String.format(NOT_SUPPORTED, getCountry()));
+		throw new UnsupportedOperationException(String.format(NOT_SUPPORTED, getType()));
 	}
 
 	default public String getStreetName() {
-		throw new UnsupportedOperationException(String.format(NOT_SUPPORTED, getCountry()));
+		throw new UnsupportedOperationException(String.format(NOT_SUPPORTED, getType()));
 	}
 
 	default public void setStreetName(String streetName) {
-		throw new UnsupportedOperationException(String.format(NOT_SUPPORTED, getCountry()));
+		throw new UnsupportedOperationException(String.format(NOT_SUPPORTED, getType()));
 	}
 
 	default public Province getProvince() {
-		throw new UnsupportedOperationException(String.format(NOT_SUPPORTED, getCountry()));
+		throw new UnsupportedOperationException(String.format(NOT_SUPPORTED, getType()));
 	}
 
 	default public void setProvince(Province province) {
-		throw new UnsupportedOperationException(String.format(NOT_SUPPORTED, getCountry()));
+		throw new UnsupportedOperationException(String.format(NOT_SUPPORTED, getType()));
 	}
 
 	default public String getPostalCode() {
-		throw new UnsupportedOperationException(String.format(NOT_SUPPORTED, getCountry()));
+		throw new UnsupportedOperationException(String.format(NOT_SUPPORTED, getType()));
 	}
 
 	default public void setPostalCode(String postalCode) {
-		throw new UnsupportedOperationException(String.format(NOT_SUPPORTED, getCountry()));
+		throw new UnsupportedOperationException(String.format(NOT_SUPPORTED, getType()));
 	}
 
 	// USA
 	default public String getAddress() {
-		throw new UnsupportedOperationException(String.format(NOT_SUPPORTED, getCountry()));
+		throw new UnsupportedOperationException(String.format(NOT_SUPPORTED, getType()));
 	}
 
 	default public void setAddress(String address) {
-		throw new UnsupportedOperationException(String.format(NOT_SUPPORTED, getCountry()));
+		throw new UnsupportedOperationException(String.format(NOT_SUPPORTED, getType()));
 	}
 
 	default public State getState() {
-		throw new UnsupportedOperationException(String.format(NOT_SUPPORTED, getCountry()));
+		throw new UnsupportedOperationException(String.format(NOT_SUPPORTED, getType()));
 	}
 
 	default public void setState(State state) {
-		throw new UnsupportedOperationException(String.format(NOT_SUPPORTED, getCountry()));
+		throw new UnsupportedOperationException(String.format(NOT_SUPPORTED, getType()));
 	}
 
 	default public int getZipCode() {
-		throw new UnsupportedOperationException(String.format(NOT_SUPPORTED, getCountry()));
+		throw new UnsupportedOperationException(String.format(NOT_SUPPORTED, getType()));
 	}
 
 	default public void setZipCode(int zipCode) {
-		throw new UnsupportedOperationException(String.format(NOT_SUPPORTED, getCountry()));
+		throw new UnsupportedOperationException(String.format(NOT_SUPPORTED, getType()));
 	}
 
 	// Other countries
 	default public List<String> getLines() {
-		throw new UnsupportedOperationException(String.format(NOT_SUPPORTED, getCountry()));
+		throw new UnsupportedOperationException(String.format(NOT_SUPPORTED, getType()));
 	}
 
 	default public void setLines(List<String> lines) {
-		throw new UnsupportedOperationException(String.format(NOT_SUPPORTED, getCountry()));
+		throw new UnsupportedOperationException(String.format(NOT_SUPPORTED, getType()));
 	}
 
 	// Shared
 	default public String getCity() {
-		throw new UnsupportedOperationException(String.format(NOT_SUPPORTED, getCountry()));
+		throw new UnsupportedOperationException(String.format(NOT_SUPPORTED, getType()));
 	}
 
 	default public void setCity(String city) {
-		throw new UnsupportedOperationException(String.format(NOT_SUPPORTED, getCountry()));
+		throw new UnsupportedOperationException(String.format(NOT_SUPPORTED, getType()));
 	}
 
-	public Country getCountry();
+	default public String getCountry() {
+		throw new UnsupportedOperationException(String.format(NOT_SUPPORTED, getType()));
+	}
+
+	default public void setCountry(String country) {
+		throw new UnsupportedOperationException(String.format(NOT_SUPPORTED, getType()));
+	}
+
+	public AddressType getType();
 	
-	public void setCountry(Country country);
+	public void setType(AddressType addressType);
 	
 	// Build the address according to the country
-	public static Builder of(Country country) {
+	public static Builder of(AddressType country) {
 		return new Builder(country);
 	}
 
@@ -99,8 +108,8 @@ public interface Address {
 
 		private final Address address;
 
-		private Builder(Country country) {
-			switch (country) {
+		private Builder(AddressType addressType) {
+			switch (addressType) {
 			case CANADA:
 				address = new Address.Canada();
 				break;
@@ -112,7 +121,7 @@ public interface Address {
 				break;
 			default:
 				throw new IllegalArgumentException(
-						String.format("%s is not supported yet, please provide an implemetation", country));
+						String.format("%s is not supported yet, please provide an implemetation", addressType));
 			}
 		}
 
@@ -156,8 +165,13 @@ public interface Address {
 			return this;
 		}
 
-		public Builder lines(List<String> lines) {
-			address.setLines(lines);
+		public Builder country(String country) {
+			address.setCountry(country);
+			return this;
+		}
+
+		public Builder withLine(String line) {
+			address.getLines().add(line);
 			return this;
 		}
 
@@ -168,15 +182,17 @@ public interface Address {
 
 	static class Canada implements Address {
 
-		private int streetNumber;
+		private int streetNumber = Integer.MIN_VALUE;
 		private String streetName;
 		private Province province;
 		private String postalCode;
 		private String city;
-		private Country country;
+		private String country;
+		private AddressType addressType;
 
 		private Canada() {
-			country = Country.CANADA;
+			addressType = AddressType.CANADA;
+			country = addressType.getName();
 		}
 
 		@Override
@@ -219,22 +235,29 @@ public interface Address {
 			this.postalCode = postalCode;
 		}
 		
+		@Override
 		public String getCity() {
 			return city;
 		}
 
+		@Override
 		public void setCity(String city) {
 			this.city = city;
 		}
+		
+		@Override
+		public String getCountry() {
+			return country;
+		}
 
 		@Override
-		public Country getCountry() {
-			return country;
+		public AddressType getType() {
+			return addressType;
 		}
 		
 		@Override
-		public void setCountry(Country country) {
-			this.country = country;
+		public void setType(AddressType country) {
+			this.addressType = country;
 		}
 	}
 
@@ -242,12 +265,14 @@ public interface Address {
 
 		private String address;
 		private State state;
-		private int zipCode;
+		private int zipCode = Integer.MIN_VALUE;
 		private String city;
-		private Country country;
+		private String country;
+		private AddressType addressType;
 
 		private USA() {
-			country = Country.USA;
+			addressType = AddressType.USA;
+			country = addressType.getName();
 		}
 
 		@Override
@@ -289,25 +314,32 @@ public interface Address {
 		public void setCity(String city) {
 			this.city = city;
 		}
+		
+		@Override
+		public String getCountry() {
+			return country;
+		}
 
 		@Override
-		public Country getCountry() {
-			return country;
+		public AddressType getType() {
+			return addressType;
 		}
 		
 		@Override
-		public void setCountry(Country country) {
-			this.country = country;
+		public void setType(AddressType addressType) {
+			this.addressType = addressType;
 		}
 	}
 
 	static class Others implements Address {
 
 		private List<String> lines;
-		private Country country;
+		private String country;
+		private AddressType addressType;
 
-		public Others() {
-			country = Country.OTHERS;
+		private Others() {
+			lines = new ArrayList<>();
+			addressType = AddressType.OTHERS;
 		}
 		
 		@Override
@@ -319,15 +351,25 @@ public interface Address {
 		public void setLines(List<String> lines) {
 			this.lines = lines;
 		}
+		
+		@Override
+		public String getCountry() {
+			return country;
+		}
 
 		@Override
-		public Country getCountry() {
-			return country;
+		public void setCountry(String country) {
+			this.country = country;
+		}
+
+		@Override
+		public AddressType getType() {
+			return addressType;
 		}
 		
 		@Override
-		public void setCountry(Country country) {
-			this.country = country;
+		public void setType(AddressType addressType) {
+			this.addressType = addressType;
 		}
 	}
 }

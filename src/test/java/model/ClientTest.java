@@ -6,7 +6,7 @@ import java.time.Month;
 import org.junit.Assert;
 import org.junit.Test;
 
-import model.enums.Country;
+import model.enums.AddressType;
 import model.enums.Gender;
 import model.enums.Language;
 import model.enums.MaritalStatus;
@@ -21,7 +21,7 @@ public class ClientTest {
 
 		// Given
 		final Client client = new Client();
-		final Address address = Address.of(Country.CANADA).streetNumber(110).streetName("Rue de la barre")
+		final Address address = Address.of(AddressType.CANADA).streetNumber(110).streetName("Rue de la barre")
 				.city("Longueuil").province(Province.QUEBEC).postalCode("J4K1A3").build();
 
 		// When
