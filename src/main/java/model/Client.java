@@ -31,7 +31,7 @@ public class Client {
 	private Province InsuranceCompanyProvince;
 	private ClientType clientType;
 
-	public Client() {
+	private Client() {
 
 	}
 
