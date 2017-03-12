@@ -16,7 +16,7 @@ public class AddressTest {
 		final Address address;
 
 		// When
-		address = Address.of(AddressType.CANADA).streetNumber(110).streetName("Rue de la barre").city("Longueuil")
+		address = Address.ofCanada().streetNumber(110).streetName("Rue de la barre").city("Longueuil")
 				.province(Province.QUEBEC).postalCode("J4K1A3").build();
 
 		// Then
@@ -36,36 +36,16 @@ public class AddressTest {
 		final Address address;
 
 		// When
-		address = Address.of(AddressType.CANADA).build();
+		address = Address.ofCanada().build();
 
 		// Then
 		Assert.assertNotNull(address);
 		Assert.assertEquals(AddressType.CANADA, address.getType());
-		Assert.assertEquals(Integer.MIN_VALUE, address.getStreetNumber());
+		Assert.assertEquals(0, address.getStreetNumber());
 		Assert.assertNull(address.getStreetName());
 		Assert.assertNull(address.getCity());
 		Assert.assertNull(address.getProvince());
 		Assert.assertNull(address.getPostalCode());
-	}
-
-	@Test(expected = UnsupportedOperationException.class)
-	public void shouldFailWhenAddingAddressLineToCanadianAddress() {
-		Address.of(AddressType.CANADA).address("Wellington str.").build();
-	}
-
-	@Test(expected = UnsupportedOperationException.class)
-	public void shouldFailWhenAddingZipCodeToCanadianAddress() {
-		Address.of(AddressType.CANADA).zipCode(75000).build();
-	}
-
-	@Test(expected = UnsupportedOperationException.class)
-	public void shouldFailWhenAddingStateToCanadianAddress() {
-		Address.of(AddressType.CANADA).state(State.NEW_YORK).build();
-	}
-
-	@Test(expected = UnsupportedOperationException.class)
-	public void shouldFailWhenBuildingCanadianAddressAsLines() {
-		Address.of(AddressType.CANADA).withLine("110 rue de la barre").withLine("Longueuil, QC").build();
 	}
 
 	@Test
@@ -75,13 +55,13 @@ public class AddressTest {
 		final Address address;
 
 		// When
-		address = Address.of(AddressType.USA).address("Wellington street").city("Richmond").state(State.NEW_YORK)
-				.zipCode(75023).build();
+		address = Address.ofUSA().addressLine("Wellington street").city("Richmond").state(State.NEW_YORK).zipCode(75023)
+				.build();
 
 		// Then
 		Assert.assertNotNull(address);
 		Assert.assertEquals(AddressType.USA, address.getType());
-		Assert.assertEquals("Wellington street", address.getAddress());
+		Assert.assertEquals("Wellington street", address.getAddressLine());
 		Assert.assertEquals("Richmond", address.getCity());
 		Assert.assertEquals(State.NEW_YORK, address.getState());
 		Assert.assertEquals(75023, address.getZipCode());
@@ -94,15 +74,15 @@ public class AddressTest {
 		final Address address;
 
 		// When
-		address = Address.of(AddressType.USA).build();
+		address = Address.ofUSA().build();
 
 		// Then
 		Assert.assertNotNull(address);
 		Assert.assertEquals(AddressType.USA, address.getType());
-		Assert.assertNull(address.getAddress());
+		Assert.assertNull(address.getAddressLine());
 		Assert.assertNull(address.getCity());
 		Assert.assertNull(address.getState());
-		Assert.assertEquals(Integer.MIN_VALUE, address.getZipCode());
+		Assert.assertEquals(0, address.getZipCode());
 	}
 
 	@Test
@@ -112,8 +92,8 @@ public class AddressTest {
 		final Address address;
 
 		// When
-		address = Address.of(AddressType.OTHERS).withLine("71 rue Chaptal").withLine("Levallois-Perret")
-				.withLine("92300").country("France").build();
+		address = Address.ofOthers().withLine("71 rue Chaptal").withLine("Levallois-Perret").withLine("92300")
+				.country("France").build();
 
 		// Then
 		Assert.assertNotNull(address);
@@ -131,7 +111,7 @@ public class AddressTest {
 		final Address address;
 
 		// When
-		address = Address.of(AddressType.OTHERS).build();
+		address = Address.ofOthers().build();
 
 		// Then
 		Assert.assertNotNull(address);
