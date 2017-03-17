@@ -1,12 +1,11 @@
 package clientservice.repositories.mongodb;
 
-import java.math.BigInteger;
-
+import org.bson.types.ObjectId;
 import org.springframework.data.repository.CrudRepository;
 
 import clientservice.models.Client;
 
 
-public interface ClientRepository extends CrudRepository<Client, BigInteger> {
+public interface ClientRepository extends CrudRepository<Client, ObjectId> {
 
 }
