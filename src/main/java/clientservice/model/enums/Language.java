@@ -1,4 +1,4 @@
-package model.enums;
+package clientservice.model.enums;
 
 public enum Language {
 

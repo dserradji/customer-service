@@ -1,19 +1,22 @@
-package model;
+package clientservice.model;
 
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
-import model.enums.ClientType;
-import model.enums.Gender;
-import model.enums.Language;
-import model.enums.MaritalStatus;
-import model.enums.NameSuffix;
-import model.enums.PhoneType;
-import model.enums.Province;
+import clientservice.model.enums.ClientType;
+import clientservice.model.enums.Gender;
+import clientservice.model.enums.InsuranceCompany;
+import clientservice.model.enums.Language;
+import clientservice.model.enums.MaritalStatus;
+import clientservice.model.enums.NameSuffix;
+import clientservice.model.enums.PhoneType;
+import clientservice.model.enums.Province;
 
-public class Client {
+public class Client extends AbstractEntity {
 
+	private static final long serialVersionUID = 5812501229591950717L;
+	
 	private String firstName;
 	private String lastName;
 	private NameSuffix suffix;
@@ -178,10 +181,10 @@ public class Client {
 	/**
 	 * Builds a client object of the provided type.
 	 * <p>
-	 * When the type is {@link model.enums.ClientType#COMPANY} then the field
+	 * When the type is {@link clientservice.model.enums.ClientType#COMPANY} then the field
 	 * lastName is used to store the company's name.
 	 * <p>
-	 * When the type is {@link model.enums.ClientType#COMPANY} then the
+	 * When the type is {@link clientservice.model.enums.ClientType#COMPANY} then the
 	 * following fields are not relevant:
 	 * <p>
 	 * <ul>
@@ -195,15 +198,15 @@ public class Client {
 	 * 
 	 * @param clientType
 	 *            The type of the client listed in the enumeration
-	 *            {@link model.enums.ClientType}
-	 * @return A builder object, the method {@link model.Client.Builder#build} returns
+	 *            {@link clientservice.model.enums.ClientType}
+	 * @return A builder object, the method {@link clientservice.model.Client.Builder#build} returns
 	 *         an implementation of Client depending on the provided type
 	 */
 	static public Builder ofType(ClientType clientType) {
 		return new Builder(clientType);
 	}
 
-	static final class Builder {
+	public static final class Builder {
 
 		private final Client client;
 

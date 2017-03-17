@@ -1,4 +1,4 @@
-package model;
+package clientservice.model;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -6,13 +6,14 @@ import java.time.Month;
 import org.junit.Assert;
 import org.junit.Test;
 
-import model.enums.ClientType;
-import model.enums.Gender;
-import model.enums.Language;
-import model.enums.MaritalStatus;
-import model.enums.NameSuffix;
-import model.enums.PhoneType;
-import model.enums.Province;
+import clientservice.model.enums.ClientType;
+import clientservice.model.enums.Gender;
+import clientservice.model.enums.InsuranceCompany;
+import clientservice.model.enums.Language;
+import clientservice.model.enums.MaritalStatus;
+import clientservice.model.enums.NameSuffix;
+import clientservice.model.enums.PhoneType;
+import clientservice.model.enums.Province;
 
 public class ClientTest {
 
