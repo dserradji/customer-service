@@ -1,12 +1,12 @@
-package clientservice.model;
+package clientservice.models;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import clientservice.model.enums.AddressType;
-import clientservice.model.enums.Province;
-import clientservice.model.enums.State;
+import clientservice.models.enums.AddressType;
+import clientservice.models.enums.Province;
+import clientservice.models.enums.State;
 
 public interface Address {
 

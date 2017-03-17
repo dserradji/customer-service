@@ -1,4 +1,4 @@
-package clientservice.model.enums;
+package clientservice.models.enums;
 
 public enum MaritalStatus {
 

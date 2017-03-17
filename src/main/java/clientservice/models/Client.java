@@ -1,17 +1,17 @@
-package clientservice.model;
+package clientservice.models;
 
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
-import clientservice.model.enums.ClientType;
-import clientservice.model.enums.Gender;
-import clientservice.model.enums.InsuranceCompany;
-import clientservice.model.enums.Language;
-import clientservice.model.enums.MaritalStatus;
-import clientservice.model.enums.NameSuffix;
-import clientservice.model.enums.PhoneType;
-import clientservice.model.enums.Province;
+import clientservice.models.enums.ClientType;
+import clientservice.models.enums.Gender;
+import clientservice.models.enums.InsuranceCompany;
+import clientservice.models.enums.Language;
+import clientservice.models.enums.MaritalStatus;
+import clientservice.models.enums.NameSuffix;
+import clientservice.models.enums.PhoneType;
+import clientservice.models.enums.Province;
 
 public class Client extends AbstractEntity {
 
@@ -181,10 +181,10 @@ public class Client extends AbstractEntity {
 	/**
 	 * Builds a client object of the provided type.
 	 * <p>
-	 * When the type is {@link clientservice.model.enums.ClientType#COMPANY} then the field
+	 * When the type is {@link clientservice.models.enums.ClientType#COMPANY} then the field
 	 * lastName is used to store the company's name.
 	 * <p>
-	 * When the type is {@link clientservice.model.enums.ClientType#COMPANY} then the
+	 * When the type is {@link clientservice.models.enums.ClientType#COMPANY} then the
 	 * following fields are not relevant:
 	 * <p>
 	 * <ul>
@@ -198,8 +198,8 @@ public class Client extends AbstractEntity {
 	 * 
 	 * @param clientType
 	 *            The type of the client listed in the enumeration
-	 *            {@link clientservice.model.enums.ClientType}
-	 * @return A builder object, the method {@link clientservice.model.Client.Builder#build} returns
+	 *            {@link clientservice.models.enums.ClientType}
+	 * @return A builder object, the method {@link clientservice.models.Client.Builder#build} returns
 	 *         an implementation of Client depending on the provided type
 	 */
 	static public Builder ofType(ClientType clientType) {

@@ -4,7 +4,7 @@ import java.math.BigInteger;
 
 import org.springframework.data.repository.CrudRepository;
 
-import clientservice.model.Client;
+import clientservice.models.Client;
 
 
 public interface ClientRepository extends CrudRepository<Client, BigInteger> {

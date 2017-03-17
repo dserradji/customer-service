@@ -1,12 +1,12 @@
-package clientservice.model;
+package clientservice.models;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-import clientservice.model.Address;
-import clientservice.model.enums.AddressType;
-import clientservice.model.enums.Province;
-import clientservice.model.enums.State;
+import clientservice.models.Address;
+import clientservice.models.enums.AddressType;
+import clientservice.models.enums.Province;
+import clientservice.models.enums.State;
 
 public class AddressTest {
 

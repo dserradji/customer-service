@@ -1,6 +1,6 @@
 package clientservice.repositories.mongodb;
 
-import static clientservice.model.enums.ClientType.PERSON;
+import static clientservice.models.enums.ClientType.PERSON;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
 
@@ -11,7 +11,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import clientservice.ApplicationConfig;
-import clientservice.model.Client;
+import clientservice.models.Client;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = ApplicationConfig.class)

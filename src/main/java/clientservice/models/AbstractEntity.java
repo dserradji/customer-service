@@ -1,4 +1,4 @@
-package clientservice.model;
+package clientservice.models;
 
 import java.io.Serializable;
 
