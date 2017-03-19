@@ -10,9 +10,22 @@ import clientservice.models.enums.Gender;
 import clientservice.models.enums.MaritalStatus;
 import clientservice.models.enums.PhoneType;
 
+/**
+ * {@code Client} is a immutable object.
+ * <p>
+ * Use {@code Client.ofType(ClientType)} to create a new client.
+ * <p>
+ * In the absence of setters use {@code Client.from(Client)} to update one or
+ * more fields of a given client, a copy of that client containing the updated
+ * fields is returned.<br>
+ * <p>
+ * Example:<br>
+ * {@code Client client = Client.ofType(ClientType.PERSON).firstName("Ken").build();}<br>
+ * {@code client = Client.from(client).firstName("Bison").build();}
+ */
 public final class Client extends AbstractEntity {
 
-	private static final long serialVersionUID = -6667780555471173824L;
+	private static final long serialVersionUID = -5104358321693677796L;
 
 	private String firstName;
 	private String lastName;
@@ -24,10 +37,6 @@ public final class Client extends AbstractEntity {
 	private String email;
 	private ClientType clientType;
 
-	private Client() {
-		// Spring data needs a default constructor
-	}
-	
 	private Client(String firstName, String lastName, Gender gender, LocalDate birthDate, MaritalStatus maritalStatus,
 			Address address, Map<PhoneType, String> phones, String email, ClientType clientType) {
 		this.firstName = firstName;
@@ -105,7 +114,7 @@ public final class Client extends AbstractEntity {
 	}
 
 	static public Builder from(Client client) {
-		
+
 		final Builder builder = new Builder(client.clientType);
 		builder.firstName = client.firstName;
 		builder.lastName = client.lastName;
@@ -195,5 +204,4 @@ public final class Client extends AbstractEntity {
 					clientType);
 		}
 	}
-
 }
