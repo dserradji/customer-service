@@ -37,6 +37,10 @@ public final class Client extends AbstractEntity {
 	private String email;
 	private ClientType clientType;
 
+	private Client() {
+		// Needed by Spring Data
+	}
+
 	private Client(String firstName, String lastName, Gender gender, LocalDate birthDate, MaritalStatus maritalStatus,
 			Address address, Map<PhoneType, String> phones, String email, ClientType clientType) {
 		this.firstName = firstName;

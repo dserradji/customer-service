@@ -5,10 +5,11 @@ import java.util.Objects;
 /**
  * {@code Address} is an immutable object.
  * <p>
- * Use {@code Address.ofCountry(CountryType)} to create a new address.
+ * Use {@code Address.ofCountry(String)} to create a new address.
  * <p>
  * In the absence of setters use {@code Address.from(Address)} to update one or
- * more fields of a given address, a copy of that address containing the updated fields is returned.<br>
+ * more fields of a given address, a copy of that address containing the updated
+ * fields is returned.<br>
  * <p>
  * Example:<br>
  * {@code Address address = Address.ofCountry("Canada").streetNumber(100).build();}<br>
@@ -25,7 +26,7 @@ public final class Address {
 	private String country;
 
 	private Address() {
-		// Spring Data needs a default constructor
+		// Needed by Spring Data
 	}
 	
 	private Address(int streetNumber, String streetName, String city, String zipcode, String stateOrProvince,
