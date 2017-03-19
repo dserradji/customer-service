@@ -1,4 +1,4 @@
-package model.enums;
+package clientservice.models.enums;
 
 public enum PhoneType {
 

@@ -1,4 +1,4 @@
-package model;
+package clientservice.models;
 
 import java.util.Objects;
 

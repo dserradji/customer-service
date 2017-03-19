@@ -1,4 +1,4 @@
-package model;
+package clientservice.models;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -11,10 +11,12 @@ import java.time.Month;
 
 import org.junit.Test;
 
-import model.enums.ClientType;
-import model.enums.Gender;
-import model.enums.MaritalStatus;
-import model.enums.PhoneType;
+import clientservice.models.Address;
+import clientservice.models.Client;
+import clientservice.models.enums.ClientType;
+import clientservice.models.enums.Gender;
+import clientservice.models.enums.MaritalStatus;
+import clientservice.models.enums.PhoneType;
 
 public class ClientTest {
 

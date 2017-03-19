@@ -1,4 +1,4 @@
-package model;
+package clientservice.models;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -6,10 +6,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import model.enums.ClientType;
-import model.enums.Gender;
-import model.enums.MaritalStatus;
-import model.enums.PhoneType;
+import clientservice.models.enums.ClientType;
+import clientservice.models.enums.Gender;
+import clientservice.models.enums.MaritalStatus;
+import clientservice.models.enums.PhoneType;
 
 public final class Client {
 
@@ -75,10 +75,10 @@ public final class Client {
 	/**
 	 * Builds a client object of the provided type.
 	 * <p>
-	 * If the type is {@link model.enums.ClientType#COMPANY} then the field
+	 * If the type is {@link clientservice.models.enums.ClientType#COMPANY} then the field
 	 * lastName is used to store the company's name.
 	 * <p>
-	 * If the type is {@link model.enums.ClientType#COMPANY} then the following
+	 * If the type is {@link clientservice.models.enums.ClientType#COMPANY} then the following
 	 * fields are not relevant:
 	 * <p>
 	 * <ul>
@@ -90,7 +90,7 @@ public final class Client {
 	 * 
 	 * @param clientType
 	 *            The type of the client, listed in the enumeration
-	 *            {@link model.enums.ClientType}
+	 *            {@link clientservice.models.enums.ClientType}
 	 * @return A builder object
 	 */
 	static public Builder ofType(ClientType clientType) {
