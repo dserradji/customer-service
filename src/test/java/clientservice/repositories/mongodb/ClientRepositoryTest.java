@@ -86,9 +86,9 @@ public class ClientRepositoryTest {
 
 		// When
 		repo.delete(saved);
-		final Client retrieved = repo.findOne(saved.getId());
+		boolean exists = repo.exists(saved.getId());
 
 		// Then
-		assertThat(retrieved, is(nullValue()));
+		assertThat(exists, is(false));
 	}
 }
