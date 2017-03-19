@@ -30,11 +30,11 @@ public class ClientRepositoryTest {
 
 		// When
 		final Client saved = repo
-				.save(Client.ofType(PERSON).firstName("John").lastName("Doe").address(address).build());
+				.save(Client.ofType(PERSON).firstName("Ken").lastName("Masters").address(address).build());
 
 		// Then
 		assertThat(saved.getId(), is(notNullValue()));
-		assertThat(saved.getFirstName(), is(equalTo("John")));
+		assertThat(saved.getFirstName(), is(equalTo("Ken")));
 		assertThat(saved.getAddress().getCountry(), is(equalTo("Shadaloo")));
 	}
 
@@ -45,7 +45,7 @@ public class ClientRepositoryTest {
 		final Address address = Address.ofCountry("Shadaloo").streetNumber(110).streetName("Bison street")
 				.city("Shadaloo City").zipcode("123456").build();
 		final Client saved = repo
-				.save(Client.ofType(PERSON).firstName("John").lastName("Doe").address(address).build());
+				.save(Client.ofType(PERSON).firstName("Ken").lastName("Masters").address(address).build());
 
 		// When
 		final Client retrieved = repo.findOne(saved.getId());
@@ -64,17 +64,17 @@ public class ClientRepositoryTest {
 		Address address = Address.ofCountry("Shadaloo").streetNumber(110).streetName("Bison street")
 				.city("Shadaloo City").zipcode("123456").build();
 		final Client saved = repo
-				.save(Client.ofType(PERSON).firstName("John").lastName("Doe").address(address).build());
+				.save(Client.ofType(PERSON).firstName("Ken").lastName("Masters").address(address).build());
 		Client retrieved = repo.findOne(saved.getId());
 		address = Address.from(address).zipcode("654321").build();
-		retrieved = Client.from(retrieved).email("johnd@email.com").address(address).build();
+		retrieved = Client.from(retrieved).email("kenm@email.com").address(address).build();
 
 		// When
 		final Client updated = repo.save(retrieved);
 
 		// Then
 		assertThat(updated.getId(), is(equalTo(retrieved.getId())));
-		assertThat(updated.getEmail(), is(equalTo("johnd@email.com")));
+		assertThat(updated.getEmail(), is(equalTo("kenm@email.com")));
 		assertThat(updated.getAddress().getZipcode(), is(equalTo("654321")));
 	}
 
@@ -82,7 +82,7 @@ public class ClientRepositoryTest {
 	public void shouldDeleteAPerson() {
 
 		// Given
-		final Client saved = repo.save(Client.ofType(PERSON).firstName("John").lastName("Doe").build());
+		final Client saved = repo.save(Client.ofType(PERSON).firstName("Ken").lastName("Masters").build());
 
 		// When
 		repo.delete(saved);
