@@ -28,7 +28,7 @@ public final class Address {
 	private Address() {
 		// Needed by Spring Data
 	}
-	
+
 	private Address(int streetNumber, String streetName, String city, String zipcode, String stateOrProvince,
 			String country) {
 		this.streetNumber = streetNumber;
@@ -63,7 +63,7 @@ public final class Address {
 		private String country;
 
 		public Builder(String country) {
-			Objects.requireNonNull(country);
+			Objects.requireNonNull(country, "Country can not be null.");
 			this.country = country;
 		}
 

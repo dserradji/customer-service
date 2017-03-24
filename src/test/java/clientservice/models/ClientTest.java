@@ -1,10 +1,6 @@
 package clientservice.models;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -34,19 +30,20 @@ public class ClientTest {
 				.email("kmasters@streetf.com").build();
 
 		// Then
-		assertThat(client, is(notNullValue()));
-		assertThat(client.getClientType(), is(equalTo(ClientType.PERSON)));
-		assertThat(client.getFirstName(), is(equalTo("Ken")));
-		assertThat(client.getLastName(), is(equalTo("Masters")));
-		assertThat(client.getGender(), is(equalTo(Gender.MALE)));
-		assertThat(client.getBirthDate(), is(equalTo(LocalDate.of(1990, Month.MARCH, 16))));
-		assertThat(client.getMaritalStatus(), is(equalTo(MaritalStatus.SINGLE)));
-		assertThat(client.getAddress().getZipcode(), is(equalTo("123456")));
-		assertThat(client.getPhones().get(PhoneType.HOME), is(equalTo("111111111")));
-		assertThat(client.getPhones().get(PhoneType.CELLULAR), is(equalTo("222222222")));
-		assertThat(client.getPhones().get(PhoneType.OFFICE), is(equalTo("333333333 Ext123")));
-		assertThat(client.getPhones().get(PhoneType.FAX), is(equalTo("444444444")));
-		assertThat(client.getEmail(), is(equalTo("kmasters@streetf.com")));
+		assertThat(client).isNotNull();
+		assertThat(client.getClientType()).isEqualTo(ClientType.PERSON);
+		assertThat(client.getFirstName()).isEqualTo("Ken");
+		assertThat(client.getLastName()).isEqualTo("Masters");
+		assertThat(client.getGender()).isEqualTo(Gender.MALE);
+		assertThat(client.getBirthDate()).isEqualTo(LocalDate.of(1990, Month.MARCH, 16));
+		assertThat(client.getMaritalStatus()).isEqualTo(MaritalStatus.SINGLE);
+		assertThat(client.getAddress().getZipcode()).isEqualTo("123456");
+		assertThat(client.getPhones()).contains(
+				entry(PhoneType.HOME, "111111111"),
+				entry(PhoneType.CELLULAR, "222222222"), 
+				entry(PhoneType.OFFICE, "333333333 Ext123"),
+				entry(PhoneType.FAX, "444444444"));
+		assertThat(client.getEmail()).isEqualTo("kmasters@streetf.com");
 	}
 
 	@Test
@@ -64,18 +61,19 @@ public class ClientTest {
 				.email("kmasters@streetf.com").build();
 
 		// Then
-		assertThat(client, is(notNullValue()));
-		assertThat(client.getClientType(), is(equalTo(ClientType.COMPANY)));
-		assertThat(client.getLastName(), is(equalTo("Acme Corp.")));
-		assertThat(client.getGender(), is(nullValue()));
-		assertThat(client.getBirthDate(), is(nullValue()));
-		assertThat(client.getMaritalStatus(), is(nullValue()));
-		assertThat(client.getAddress().getZipcode(), is(equalTo("123456")));
-		assertThat(client.getPhones().get(PhoneType.HOME), is(equalTo("111111111")));
-		assertThat(client.getPhones().get(PhoneType.CELLULAR), is(equalTo("222222222")));
-		assertThat(client.getPhones().get(PhoneType.OFFICE), is(equalTo("333333333 Ext123")));
-		assertThat(client.getPhones().get(PhoneType.FAX), is(equalTo("444444444")));
-		assertThat(client.getEmail(), is(equalTo("kmasters@streetf.com")));
+		assertThat(client).isNotNull();
+		assertThat(client.getClientType()).isEqualTo(ClientType.COMPANY);
+		assertThat(client.getLastName()).isEqualTo("Acme Corp.");
+		assertThat(client.getGender()).isNull();
+		assertThat(client.getBirthDate()).isNull();
+		assertThat(client.getMaritalStatus()).isNull();
+		assertThat(client.getAddress().getZipcode()).isEqualTo("123456");
+		assertThat(client.getPhones()).contains(
+				entry(PhoneType.HOME, "111111111"),
+				entry(PhoneType.CELLULAR, "222222222"), 
+				entry(PhoneType.OFFICE, "333333333 Ext123"),
+				entry(PhoneType.FAX, "444444444"));
+		assertThat(client.getEmail()).isEqualTo("kmasters@streetf.com");
 	}
 
 	@Test
@@ -94,22 +92,23 @@ public class ClientTest {
 		client = Client.from(client).lastName("Acme Inc.").build();
 
 		// Then
-		assertThat(client, is(notNullValue()));
-		assertThat(client.getClientType(), is(equalTo(ClientType.COMPANY)));
-		assertThat(client.getLastName(), is(equalTo("Acme Inc.")));
-		assertThat(client.getGender(), is(nullValue()));
-		assertThat(client.getBirthDate(), is(nullValue()));
-		assertThat(client.getMaritalStatus(), is(nullValue()));
-		assertThat(client.getAddress().getZipcode(), is(equalTo("123456")));
-		assertThat(client.getPhones().get(PhoneType.HOME), is(equalTo("111111111")));
-		assertThat(client.getPhones().get(PhoneType.CELLULAR), is(equalTo("222222222")));
-		assertThat(client.getPhones().get(PhoneType.OFFICE), is(equalTo("333333333 Ext123")));
-		assertThat(client.getPhones().get(PhoneType.FAX), is(equalTo("444444444")));
-		assertThat(client.getEmail(), is(equalTo("kmasters@streetf.com")));
+		assertThat(client).isNotNull();
+		assertThat(client.getClientType()).isEqualTo(ClientType.COMPANY);
+		assertThat(client.getLastName()).isEqualTo("Acme Inc.");
+		assertThat(client.getGender()).isNull();
+		assertThat(client.getBirthDate()).isNull();
+		assertThat(client.getMaritalStatus()).isNull();
+		assertThat(client.getAddress().getZipcode()).isEqualTo("123456");
+		assertThat(client.getPhones()).contains(
+				entry(PhoneType.HOME, "111111111"),
+				entry(PhoneType.CELLULAR, "222222222"), 
+				entry(PhoneType.OFFICE, "333333333 Ext123"),
+				entry(PhoneType.FAX, "444444444"));
+		assertThat(client.getEmail()).isEqualTo("kmasters@streetf.com");
 	}
 
-	@Test(expected = NullPointerException.class)
+	@Test
 	public void shouldFailIfClientTypeIsNull() {
-		Client.ofType(null).build();
+		assertThatThrownBy(() -> Client.ofType(null).build()).hasMessage("Client type can not be null.");
 	}
 }

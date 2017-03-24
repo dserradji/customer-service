@@ -145,7 +145,7 @@ public final class Client extends AbstractEntity {
 		private ClientType clientType;
 
 		public Builder(ClientType clientType) {
-			Objects.requireNonNull(clientType);
+			Objects.requireNonNull(clientType, "Client type can not be null.");
 			this.clientType = clientType;
 		}
 

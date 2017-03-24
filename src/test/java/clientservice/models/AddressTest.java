@@ -1,10 +1,6 @@
 package clientservice.models;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 import org.junit.Test;
 
@@ -23,13 +19,13 @@ public class AddressTest {
 				.zipcode("123456").build();
 
 		// Then
-		assertThat(address, is(notNullValue()));
-		assertThat(address.getCountry(), is(equalTo("Shadaloo")));
-		assertThat(address.getStreetNumber(), is(equalTo(110)));
-		assertThat(address.getStreetName(), is(equalTo("Bison street")));
-		assertThat(address.getCity(), is(equalTo("Shadaloo City")));
-		assertThat(address.getStateOrProvince(), is(nullValue()));
-		assertThat(address.getZipcode(), is(equalTo("123456")));
+		assertThat(address).isNotNull();
+		assertThat(address.getCountry()).isEqualTo("Shadaloo");
+		assertThat(address.getStreetNumber()).isEqualTo(110);
+		assertThat(address.getStreetName()).isEqualTo("Bison street");
+		assertThat(address.getCity()).isEqualTo("Shadaloo City");
+		assertThat(address.getStateOrProvince()).isNull();
+		assertThat(address.getZipcode()).isEqualTo("123456");
 	}
 
 	@Test
@@ -43,18 +39,18 @@ public class AddressTest {
 		address = Address.from(address).streetNumber(2000).build();
 
 		// Then
-		assertThat(address, is(notNullValue()));
-		assertThat(address.getCountry(), is(equalTo("Shadaloo")));
-		assertThat(address.getStreetNumber(), is(equalTo(2000)));
-		assertThat(address.getStreetName(), is(equalTo("Bison street")));
-		assertThat(address.getCity(), is(equalTo("Shadaloo City")));
-		assertThat(address.getStateOrProvince(), is(nullValue()));
-		assertThat(address.getZipcode(), is(equalTo("123456")));
+		assertThat(address).isNotNull();
+		assertThat(address.getCountry()).isEqualTo("Shadaloo");
+		assertThat(address.getStreetNumber()).isEqualTo(2000);
+		assertThat(address.getStreetName()).isEqualTo("Bison street");
+		assertThat(address.getCity()).isEqualTo("Shadaloo City");
+		assertThat(address.getStateOrProvince()).isNull();
+		assertThat(address.getZipcode()).isEqualTo("123456");
 	}
 
-	@Test(expected = NullPointerException.class)
+	@Test
 	public void shouldFailIfCountryIsNull() {
 
-		Address.ofCountry(null).build();
+		assertThatThrownBy(() -> Address.ofCountry(null)).hasMessage("Country can not be null.");
 	}
 }

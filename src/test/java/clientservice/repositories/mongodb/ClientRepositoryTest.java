@@ -1,8 +1,7 @@
 package clientservice.repositories.mongodb;
 
 import static clientservice.models.enums.ClientType.PERSON;
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,9 +32,9 @@ public class ClientRepositoryTest {
 				.save(Client.ofType(PERSON).firstName("Ken").lastName("Masters").address(address).build());
 
 		// Then
-		assertThat(saved.getId(), is(notNullValue()));
-		assertThat(saved.getFirstName(), is(equalTo("Ken")));
-		assertThat(saved.getAddress().getCountry(), is(equalTo("Shadaloo")));
+		assertThat(saved.getId()).isNotNull();
+		assertThat(saved.getFirstName()).isEqualTo("Ken");
+		assertThat(saved.getAddress().getCountry()).isEqualTo("Shadaloo");
 	}
 
 	@Test
@@ -51,10 +50,10 @@ public class ClientRepositoryTest {
 		final Client retrieved = repo.findOne(saved.getId());
 
 		// Then
-		assertThat(retrieved, is(notNullValue()));
-		assertThat(retrieved.getId(), is(equalTo(saved.getId())));
-		assertThat(retrieved.getFirstName(), is(equalTo(saved.getFirstName())));
-		assertThat(retrieved.getAddress().getCountry(), is(equalTo("Shadaloo")));
+		assertThat(retrieved).isNotNull();
+		assertThat(retrieved.getId()).isEqualTo(saved.getId());
+		assertThat(retrieved.getFirstName()).isEqualTo(saved.getFirstName());
+		assertThat(retrieved.getAddress().getCountry()).isEqualTo("Shadaloo");
 	}
 
 	@Test
@@ -73,9 +72,9 @@ public class ClientRepositoryTest {
 		final Client updated = repo.save(retrieved);
 
 		// Then
-		assertThat(updated.getId(), is(equalTo(retrieved.getId())));
-		assertThat(updated.getEmail(), is(equalTo("kenm@email.com")));
-		assertThat(updated.getAddress().getZipcode(), is(equalTo("654321")));
+		assertThat(updated.getId()).isEqualTo(retrieved.getId());
+		assertThat(updated.getEmail()).isEqualTo("kenm@email.com");
+		assertThat(updated.getAddress().getZipcode()).isEqualTo("654321");
 	}
 
 	@Test
@@ -89,6 +88,6 @@ public class ClientRepositoryTest {
 		boolean exists = repo.exists(saved.getId());
 
 		// Then
-		assertThat(exists, is(false));
+		assertThat(exists).isFalse();
 	}
 }
