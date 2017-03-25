@@ -1,8 +1,9 @@
 package clientservice.repositories.mongodb;
 
-import static clientservice.models.enums.ClientType.PERSON;
+import static clientservice.models.enums.ClientType.*;
 import static org.assertj.core.api.Assertions.*;
 
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,11 @@ public class ClientRepositoryIT {
 	@Autowired
 	private ClientRepository repo;
 
+	@After
+	public void cleanDB() {
+		repo.deleteAll();
+	}
+	
 	@Test
 	public void shouldCreateAPersonWithId() {
 
@@ -89,5 +95,35 @@ public class ClientRepositoryIT {
 
 		// Then
 		assertThat(exists).isFalse();
+	}
+
+	@Test
+	public void shouldReturnAllClients() {
+
+		// Given
+		final Address address = Address.ofCountry("Shadaloo").streetNumber(110).streetName("Bison street")
+				.city("Shadaloo City").zipcode("123456").build();
+		repo.save(Client.ofType(PERSON).firstName("Ken").lastName("Masters").address(address).build());
+		repo.save(Client.ofType(COMPANY).firstName("Ken").lastName("Masters").address(address).build());
+
+		// When
+		final Iterable<Client> clients = repo.findAll();
+
+		// Then
+		assertThat(clients).isNotNull();
+		assertThat(clients.iterator()).hasSize(2);
+	}
+
+	@Test
+	public void shouldReturnNoClients() {
+
+		// Given
+
+		// When
+		final Iterable<Client> clients = repo.findAll();
+
+		// Then
+		assertThat(clients).isNotNull();
+		assertThat(clients.iterator()).hasSize(0);
 	}
 }
