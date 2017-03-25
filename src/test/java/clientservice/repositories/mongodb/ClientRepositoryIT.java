@@ -1,7 +1,8 @@
 package clientservice.repositories.mongodb;
 
-import static clientservice.models.enums.ClientType.*;
-import static org.assertj.core.api.Assertions.*;
+import static clientservice.models.enums.ClientType.COMPANY;
+import static clientservice.models.enums.ClientType.PERSON;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.After;
 import org.junit.Test;
@@ -53,7 +54,7 @@ public class ClientRepositoryIT {
 				.save(Client.ofType(PERSON).firstName("Ken").lastName("Masters").address(address).build());
 
 		// When
-		final Client retrieved = repo.findOne(saved.getId());
+		final Client retrieved = repo.findOne(saved.getId()).get();
 
 		// Then
 		assertThat(retrieved).isNotNull();
@@ -70,7 +71,7 @@ public class ClientRepositoryIT {
 				.city("Shadaloo City").zipcode("123456").build();
 		final Client saved = repo
 				.save(Client.ofType(PERSON).firstName("Ken").lastName("Masters").address(address).build());
-		Client retrieved = repo.findOne(saved.getId());
+		Client retrieved = repo.findOne(saved.getId()).get();
 		address = Address.from(address).zipcode("654321").build();
 		retrieved = Client.from(retrieved).email("kenm@email.com").address(address).build();
 
