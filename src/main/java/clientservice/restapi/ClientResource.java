@@ -3,14 +3,18 @@ package clientservice.restapi;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
+import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 
 import java.net.URI;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,19 +40,23 @@ public class ClientResource {
 	public ResponseEntity<?> addClient(@RequestBody @Valid Client newClient) {
 
 		if (newClient.getId() != null && repo.exists(newClient.getId())) {
-			throw new ClientResourceException(HttpStatus.BAD_REQUEST, "Client already exists.");
+			throw new ClientResourceException(HttpStatus.BAD_REQUEST, 
+					"Client already exists, to update an existing client use PUT instead.");
 		}
 
 		final Client created = repo.save(newClient);
 		return ResponseEntity.created(URI.create(String.format("/clients/%s", created.getId()))).build();
 	}
 
-	// @RequestMapping(method = PUT, consumes = { APPLICATION_JSON_UTF8_VALUE })
-	// public ResponseEntity<?> updateClient(@RequestBody @Valid Client update)
-	// {
-	//
-	// final Client updatedClient = repo.save(update);
-	// return ResponseEntity.created(URI.create(String.format("/clients/%s",
-	// created.getId()))).build();
-	// }
+	@RequestMapping(method = PUT, value = "/{id}", consumes = { APPLICATION_JSON_UTF8_VALUE })
+	public ResponseEntity<?> updateClient(@PathVariable @NotNull ObjectId id, @RequestBody @Valid Client update) {
+
+		if (!repo.exists(id)) {
+			throw new ClientResourceException(HttpStatus.BAD_REQUEST,
+					"Client does not exist, to create a new client use POST instead.");
+		}
+
+		repo.save(update);
+		return ResponseEntity.noContent().build();
+	}
 }

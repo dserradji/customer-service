@@ -1,5 +1,8 @@
 package clientservice.restapi;
 
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.springframework.http.HttpStatus.valueOf;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.http.HttpStatus;
@@ -23,8 +26,8 @@ public class ClientResourceErrorHandler extends ResponseEntityExceptionHandler {
 	ResponseEntity<?> handleControllerException(HttpServletRequest request, Exception ex) {
 		
 		final Integer statusCode = (Integer) request.getAttribute("javax.servlet.error.status_code");
-		final HttpStatus status = (statusCode == null ? HttpStatus.INTERNAL_SERVER_ERROR : HttpStatus.valueOf(statusCode));
+		final HttpStatus status = (statusCode == null ? INTERNAL_SERVER_ERROR : valueOf(statusCode));
 		
-		return new ResponseEntity<>(ex.getMessage(), status);
+		return new ResponseEntity<>(ex.getCause().getMessage(), status);
 	}
 }
