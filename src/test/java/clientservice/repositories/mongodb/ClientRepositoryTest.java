@@ -17,7 +17,7 @@ import clientservice.models.Client;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = ApplicationConfig.class)
-public class ClientRepositoryIT {
+public class ClientRepositoryTest {
 
 	@Autowired
 	private ClientRepository repo;

@@ -36,7 +36,7 @@ import clientservice.repositories.mongodb.ClientRepository;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(ClientResource.class)
-public class ClientResourceIT {
+public class ClientResourceTest {
 
 	@MockBean
 	private ClientRepository repo;
