@@ -8,7 +8,7 @@ public abstract class AbstractEntity implements Serializable {
 
 	private static final long serialVersionUID = 1971331382735300376L;
 
-	ObjectId id;
+	protected ObjectId id;
 	
 	public ObjectId getId() {
 		return id;

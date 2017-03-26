@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+import javax.validation.constraints.NotNull;
+
 import clientservice.models.enums.ClientType;
 import clientservice.models.enums.Gender;
 import clientservice.models.enums.MaritalStatus;
@@ -35,10 +37,11 @@ public final class Client extends AbstractEntity {
 	private Address address;
 	private Map<PhoneType, String> phones;
 	private String email;
+	@NotNull
 	private ClientType clientType;
 
 	private Client() {
-		// Needed by Spring Data
+		// Spring Data and Spring MVC need a default constructor
 	}
 
 	private Client(String firstName, String lastName, Gender gender, LocalDate birthDate, MaritalStatus maritalStatus,
