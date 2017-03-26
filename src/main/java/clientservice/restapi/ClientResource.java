@@ -1,6 +1,7 @@
 package clientservice.restapi;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
+import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 import static org.springframework.web.bind.annotation.RequestMethod.PUT;
@@ -40,7 +41,7 @@ public class ClientResource {
 	public ResponseEntity<?> addClient(@RequestBody @Valid Client newClient) {
 
 		if (newClient.getId() != null && repo.exists(newClient.getId())) {
-			throw new ClientResourceException(HttpStatus.BAD_REQUEST, 
+			throw new ClientResourceException(HttpStatus.BAD_REQUEST,
 					"Client already exists, to update an existing client use PUT instead.");
 		}
 
@@ -57,6 +58,27 @@ public class ClientResource {
 		}
 
 		repo.save(update);
+		return ResponseEntity.noContent().build();
+	}
+
+	/**
+	 * Deletes a client identified by its id.
+	 * <p>
+	 * This method is idempotent, if it's called multiples times with the same
+	 * id then the first call will delete the client and the following calls
+	 * will be silently ignored.
+	 * 
+	 * @param id
+	 *            The id of the client to delete
+	 * @return
+	 */
+	@RequestMapping(method = DELETE, value = "/{id}")
+	public ResponseEntity<?> deleteClient(@PathVariable @NotNull ObjectId id) {
+
+		if (repo.exists(id)) {
+			repo.delete(id);
+		}
+
 		return ResponseEntity.noContent().build();
 	}
 }

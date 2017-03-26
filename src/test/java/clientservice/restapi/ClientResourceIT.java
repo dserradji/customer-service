@@ -8,6 +8,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -110,7 +111,7 @@ public class ClientResourceIT {
 		given(repo.save(any(Client.class))).willReturn(Client.ofType(PERSON).build());
 		
 		final ObjectId id = new ObjectId(1000, 2000, (short) 1, 5000);
-		final String UPDATE = String.format("{\"id\":\"%s\",\"firstName\":\"John\",\"lastName\":\"Doe\",\"clientTypef\":\"COMPANY\"}", id);
+		final String UPDATE = String.format("{\"id\":\"%s\",\"firstName\":\"John\",\"lastName\":\"Doe\",\"clientType\":\"COMPANY\"}", id);
 
 		// Expect HTTP 204
 		mvc.perform(put(String.format("/clients/%s", id)).contentType(APPLICATION_JSON_UTF8).content(UPDATE))
@@ -118,7 +119,7 @@ public class ClientResourceIT {
 	}
 	
 	@Test
-	public void shouldFailUpdatingNotExistingClient() throws Exception {
+	public void shouldFailUpdatingNonExistingClient() throws Exception {
 
 		given(repo.exists(any(ObjectId.class))).willReturn(false);
 		
@@ -128,5 +129,29 @@ public class ClientResourceIT {
 		// Expect HTTP 204
 		mvc.perform(put(String.format("/clients/%s", id)).contentType(APPLICATION_JSON_UTF8).content(UPDATE))
 				.andExpect(status().isBadRequest());
+	}
+	
+	@Test
+	public void shouldDeleteAnExistingClient() throws Exception {
+
+		given(repo.exists(any(ObjectId.class))).willReturn(true);
+		
+		final ObjectId id = new ObjectId(1000, 2000, (short) 1, 5000);
+
+		// Expect HTTP 204
+		mvc.perform(delete(String.format("/clients/%s", id))).andExpect(status().isNoContent());
+	}
+	
+	@Test
+	public void shouldDeleteExistingClientAndIgnoreFollowingCalls() throws Exception {
+
+		given(repo.exists(any(ObjectId.class))).willReturn(true).willReturn(false);
+		
+		final ObjectId id = new ObjectId(1000, 2000, (short) 1, 5000);
+
+		// Expect HTTP 204
+		mvc.perform(delete(String.format("/clients/%s", id))).andExpect(status().isNoContent());
+		mvc.perform(delete(String.format("/clients/%s", id))).andExpect(status().isNoContent());
+		mvc.perform(delete(String.format("/clients/%s", id))).andExpect(status().isNoContent());
 	}
 }
