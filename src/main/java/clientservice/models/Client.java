@@ -42,6 +42,7 @@ public final class Client extends AbstractEntity {
 
 	private Client() {
 		// Spring Data and Spring MVC need a default constructor
+		phones = new HashMap<>();
 	}
 
 	private Client(String firstName, String lastName, Gender gender, LocalDate birthDate, MaritalStatus maritalStatus,
