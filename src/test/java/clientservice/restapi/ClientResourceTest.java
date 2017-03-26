@@ -9,7 +9,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -67,6 +67,17 @@ public class ClientResourceTest {
 	}
 
 	@Test
+	public void shouldReturnHeadersOnly() throws Exception {
+
+		final List<Client> clients = Arrays.asList(Client.ofType(PERSON).build(), Client.ofType(COMPANY).build());
+
+		given(repo.findAll()).willReturn(clients);
+
+		// Expect HTTP 200
+		mvc.perform(head("/clients").accept(APPLICATION_JSON_UTF8)).andExpect(status().isOk());
+	}
+
+	@Test
 	public void shouldAddANewClient() throws Exception {
 
 		final Client newClient = Client.ofType(PERSON).build();
@@ -86,7 +97,7 @@ public class ClientResourceTest {
 	public void shouldNotAddClientIfContentIsNotValid() throws Exception {
 
 		final String BAD_JSON = "{\"bad_property\":\"PERSON\"}";
-		
+
 		// Expect HTTP 400
 		mvc.perform(post("/clients").contentType(APPLICATION_JSON_UTF8).content(BAD_JSON))
 				.andExpect(status().isBadRequest());
@@ -103,50 +114,52 @@ public class ClientResourceTest {
 		mvc.perform(post("/clients").contentType(APPLICATION_JSON_UTF8).content(EXISTING_CLIENT))
 				.andExpect(status().isBadRequest());
 	}
-	
+
 	@Test
 	public void shouldUpdateAnExistingClient() throws Exception {
 
 		given(repo.exists(any(ObjectId.class))).willReturn(true);
 		given(repo.save(any(Client.class))).willReturn(Client.ofType(PERSON).build());
-		
+
 		final ObjectId id = new ObjectId(1000, 2000, (short) 1, 5000);
-		final String UPDATE = String.format("{\"id\":\"%s\",\"firstName\":\"John\",\"lastName\":\"Doe\",\"clientType\":\"COMPANY\"}", id);
+		final String UPDATE = String
+				.format("{\"id\":\"%s\",\"firstName\":\"John\",\"lastName\":\"Doe\",\"clientType\":\"COMPANY\"}", id);
 
 		// Expect HTTP 204
 		mvc.perform(put(String.format("/clients/%s", id)).contentType(APPLICATION_JSON_UTF8).content(UPDATE))
 				.andExpect(status().isNoContent());
 	}
-	
+
 	@Test
 	public void shouldFailUpdatingNonExistingClient() throws Exception {
 
 		given(repo.exists(any(ObjectId.class))).willReturn(false);
-		
+
 		final ObjectId id = new ObjectId(1000, 2000, (short) 1, 5000);
-		final String UPDATE = String.format("{\"id\":\"%s\",\"firstName\":\"John\",\"lastName\":\"Doe\",\"clientType\":\"COMPANY\"}", id);
+		final String UPDATE = String
+				.format("{\"id\":\"%s\",\"firstName\":\"John\",\"lastName\":\"Doe\",\"clientType\":\"COMPANY\"}", id);
 
 		// Expect HTTP 204
 		mvc.perform(put(String.format("/clients/%s", id)).contentType(APPLICATION_JSON_UTF8).content(UPDATE))
 				.andExpect(status().isBadRequest());
 	}
-	
+
 	@Test
 	public void shouldDeleteAnExistingClient() throws Exception {
 
 		given(repo.exists(any(ObjectId.class))).willReturn(true);
-		
+
 		final ObjectId id = new ObjectId(1000, 2000, (short) 1, 5000);
 
 		// Expect HTTP 204
 		mvc.perform(delete(String.format("/clients/%s", id))).andExpect(status().isNoContent());
 	}
-	
+
 	@Test
 	public void shouldDeleteExistingClientAndIgnoreFollowingCalls() throws Exception {
 
 		given(repo.exists(any(ObjectId.class))).willReturn(true).willReturn(false);
-		
+
 		final ObjectId id = new ObjectId(1000, 2000, (short) 1, 5000);
 
 		// Expect HTTP 204 for each call

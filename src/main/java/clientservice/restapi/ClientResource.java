@@ -30,6 +30,13 @@ public class ClientResource {
 	@Autowired
 	private ClientRepository repo;
 
+	/**
+	 * Return all existing clients.
+	 * <p>
+	 * This method is idempotent.
+	 * 
+	 * @return A list of clients
+	 */
 	@RequestMapping(method = GET)
 	public ResponseEntity<?> allClients() {
 
@@ -49,6 +56,16 @@ public class ClientResource {
 		return ResponseEntity.created(URI.create(String.format("/clients/%s", created.getId()))).build();
 	}
 
+	/**
+	 * Updates an existing client.
+	 * <p>
+	 * This method is idempotent.
+	 * <p>
+	 * @param id The id of the client to update
+	 * @param update The Client object containing the updated version to be persisted
+	 * 
+	 * @return
+	 */
 	@RequestMapping(method = PUT, value = "/{id}", consumes = { APPLICATION_JSON_UTF8_VALUE })
 	public ResponseEntity<?> updateClient(@PathVariable @NotNull ObjectId id, @RequestBody @Valid Client update) {
 
