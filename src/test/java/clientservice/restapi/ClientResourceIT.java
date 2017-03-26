@@ -96,8 +96,8 @@ public class ClientResourceIT {
 		given(repo.exists(any(ObjectId.class))).willReturn(true);
 		final ObjectId id = new ObjectId(1000, 2000, (short)1, 5000);
 		
-		final String UPDATE = String.format("{\"id\":\"%s\",\"clientType\":\"COMPANY\"}", id);
-		mvc.perform(post("/clients").contentType(APPLICATION_JSON_UTF8).content(UPDATE))
+		final String EXISTING_CLIENT = String.format("{\"id\":\"%s\",\"clientType\":\"COMPANY\"}", id);
+		mvc.perform(post("/clients").contentType(APPLICATION_JSON_UTF8).content(EXISTING_CLIENT))
 			.andExpect(status().isBadRequest());	// HTTP 400
 	}
 	
