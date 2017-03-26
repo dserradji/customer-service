@@ -149,7 +149,7 @@ public class ClientResourceIT {
 		
 		final ObjectId id = new ObjectId(1000, 2000, (short) 1, 5000);
 
-		// Expect HTTP 204
+		// Expect HTTP 204 for each call
 		mvc.perform(delete(String.format("/clients/%s", id))).andExpect(status().isNoContent());
 		mvc.perform(delete(String.format("/clients/%s", id))).andExpect(status().isNoContent());
 		mvc.perform(delete(String.format("/clients/%s", id))).andExpect(status().isNoContent());
