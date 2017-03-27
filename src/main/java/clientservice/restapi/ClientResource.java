@@ -27,8 +27,12 @@ import clientservice.repositories.mongodb.ClientRepository;
 @RequestMapping(path = "/clients", produces = { APPLICATION_JSON_UTF8_VALUE })
 public class ClientResource {
 
-	@Autowired
 	private ClientRepository repo;
+
+	@Autowired
+	public ClientResource(ClientRepository repo) {
+		this.repo = repo;
+	}
 
 	/**
 	 * Return all existing clients.
@@ -61,8 +65,12 @@ public class ClientResource {
 	 * <p>
 	 * This method is idempotent.
 	 * <p>
-	 * @param id The id of the client to update
-	 * @param update The Client object containing the updated version to be persisted
+	 * 
+	 * @param id
+	 *            The id of the client to update
+	 * @param update
+	 *            The Client object containing the updated version to be
+	 *            persisted
 	 * 
 	 * @return
 	 */
@@ -82,8 +90,8 @@ public class ClientResource {
 	 * Deletes a client identified by its id.
 	 * <p>
 	 * This method is idempotent, if it's called multiples times with the same
-	 * id then the first call will delete the client and the following calls
-	 * will be silently ignored.
+	 * id then the first call will delete the client and subsequent calls will
+	 * be silently ignored.
 	 * 
 	 * @param id
 	 *            The id of the client to delete

@@ -2,169 +2,168 @@ package clientservice.restapi;
 
 import static clientservice.models.enums.ClientType.COMPANY;
 import static clientservice.models.enums.ClientType.PERSON;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.hasItems;
-import static org.hamcrest.CoreMatchers.is;
+import static java.lang.String.format;
+import static java.util.Arrays.asList;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.OK;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import org.bson.types.ObjectId;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.test.web.servlet.MockMvc;
 
 import clientservice.models.Client;
+import clientservice.models.enums.ClientType;
 import clientservice.repositories.mongodb.ClientRepository;
 
-@RunWith(SpringRunner.class)
-@WebMvcTest(ClientResource.class)
+@RunWith(MockitoJUnitRunner.class)
 public class ClientResourceTest {
 
-	@MockBean
+	@Mock
 	private ClientRepository repo;
 
-	@Autowired
-	private MockMvc mvc;
+	@InjectMocks
+	private ClientResource controller;
 
+	@SuppressWarnings("unchecked")
 	@Test
-	public void shouldReturnAllClients() throws Exception {
+	public void shouldReturnAllClients() {
 
-		final List<Client> clients = Arrays.asList(Client.ofType(PERSON).build(), Client.ofType(COMPANY).build());
+		// Given
+		final List<Client> clients = asList(Client.ofType(PERSON).build(), Client.ofType(COMPANY).build());
+		when(repo.findAll()).thenReturn(clients);
 
-		given(repo.findAll()).willReturn(clients);
+		// When
+		final ResponseEntity<?> response = controller.allClients();
 
-		// Expect HTTP 200
-		mvc.perform(get("/clients").accept(APPLICATION_JSON_UTF8)).andExpect(status().isOk())
-				.andExpect(content().contentType(APPLICATION_JSON_UTF8)).andExpect(jsonPath("$..clientType").isArray())
-				.andExpect(jsonPath("$..clientType").value(hasItems(PERSON.toString(), COMPANY.toString())));
+		// Then
+		assertThat(response.getStatusCode()).isEqualTo(OK);
+		assertThat((Iterable<Client>) response.getBody()).asList().containsAll(clients);
 	}
 
 	@Test
-	public void shouldReturnEmptyBodyWhenNoClients() throws Exception {
+	public void shouldReturnEmptyBodyWhenNoClients() {
 
-		given(repo.findAll()).willReturn(Collections.emptyList());
+		// Given
+		when(repo.findAll()).thenReturn(Collections.emptyList());
 
-		// Expect HTTP 204
-		mvc.perform(get("/clients").accept(APPLICATION_JSON_UTF8)).andExpect(status().isNoContent());
+		// When
+		final ResponseEntity<?> response = controller.allClients();
+
+		// Then
+		assertThat(response.getStatusCode()).isEqualTo(NO_CONTENT);
 	}
 
 	@Test
-	public void shouldReturnHeadersOnly() throws Exception {
+	public void shouldAddANewClient() {
 
-		final List<Client> clients = Arrays.asList(Client.ofType(PERSON).build(), Client.ofType(COMPANY).build());
-
-		given(repo.findAll()).willReturn(clients);
-
-		// Expect HTTP 200
-		mvc.perform(head("/clients").accept(APPLICATION_JSON_UTF8)).andExpect(status().isOk());
-	}
-
-	@Test
-	public void shouldAddANewClient() throws Exception {
-
+		// Given
 		final Client newClient = Client.ofType(PERSON).build();
 
-		final ObjectId id = new ObjectId(1000, 2000, (short) 1, 5000);
+		final ObjectId id = ObjectId.get();
 		ReflectionTestUtils.setField(newClient, "id", id);
 
-		given(repo.save(any(Client.class))).willReturn(newClient);
+		when(repo.save(any(Client.class))).thenReturn(newClient);
 
-		// Expect HTTP 201
-		mvc.perform(post("/clients").contentType(APPLICATION_JSON_UTF8).content("{\"clientType\":\"PERSON\"}"))
-				.andExpect(status().isCreated())
-				.andExpect(header().string("Location", is(equalTo(String.format("/clients/%s", id)))));
-	}
+		// When
+		final ResponseEntity<?> response = controller.addClient(newClient);
 
-	@Test
-	public void shouldNotAddClientIfContentIsNotValid() throws Exception {
-
-		final String BAD_JSON = "{\"bad_property\":\"PERSON\"}";
-
-		// Expect HTTP 400
-		mvc.perform(post("/clients").contentType(APPLICATION_JSON_UTF8).content(BAD_JSON))
-				.andExpect(status().isBadRequest());
+		// Then
+		assertThat(response.getStatusCode()).isEqualTo(CREATED);
+		assertThat(response.getHeaders().getLocation().toString()).isEqualTo(format("/clients/%s", id));
 	}
 
 	@Test
 	public void shouldNotAddClientIfClientAlreadyExists() throws Exception {
 
-		given(repo.exists(any(ObjectId.class))).willReturn(true);
-		final ObjectId id = new ObjectId(1000, 2000, (short) 1, 5000);
+		// Given
+		when(repo.exists(any(ObjectId.class))).thenReturn(true);
+		final ObjectId id = ObjectId.get();
+		final Client client = Client.ofType(PERSON).build();
+		ReflectionTestUtils.setField(client, "id", id);
 
-		// Expect HTTP 400
-		final String EXISTING_CLIENT = String.format("{\"id\":\"%s\",\"clientType\":\"COMPANY\"}", id);
-		mvc.perform(post("/clients").contentType(APPLICATION_JSON_UTF8).content(EXISTING_CLIENT))
-				.andExpect(status().isBadRequest());
+		// When
+		// Then
+		assertThatThrownBy(() -> controller.addClient(client)).isInstanceOf(ClientResourceException.class)
+				.hasMessageContaining("Client already exists");
 	}
 
 	@Test
-	public void shouldUpdateAnExistingClient() throws Exception {
+	public void shouldUpdateAnExistingClient() {
 
-		given(repo.exists(any(ObjectId.class))).willReturn(true);
-		given(repo.save(any(Client.class))).willReturn(Client.ofType(PERSON).build());
+		// Given
+		when(repo.exists(any(ObjectId.class))).thenReturn(true);
+		when(repo.save(any(Client.class))).thenReturn(Client.ofType(PERSON).build());
+		final ObjectId id = ObjectId.get();
+		final Client existingClient = Client.ofType(ClientType.PERSON).build();
+		ReflectionTestUtils.setField(existingClient, "id", id);
 
-		final ObjectId id = new ObjectId(1000, 2000, (short) 1, 5000);
-		final String UPDATE = String
-				.format("{\"id\":\"%s\",\"firstName\":\"John\",\"lastName\":\"Doe\",\"clientType\":\"COMPANY\"}", id);
+		// When
+		final ResponseEntity<?> response = controller.updateClient(existingClient.getId(), existingClient);
 
 		// Expect HTTP 204
-		mvc.perform(put(String.format("/clients/%s", id)).contentType(APPLICATION_JSON_UTF8).content(UPDATE))
-				.andExpect(status().isNoContent());
+		assertThat(response.getStatusCode()).isEqualTo(NO_CONTENT);
 	}
 
 	@Test
-	public void shouldFailUpdatingNonExistingClient() throws Exception {
+	public void shouldFailUpdatingNonExistingClient() {
 
-		given(repo.exists(any(ObjectId.class))).willReturn(false);
+		// Given
+		when(repo.exists(any(ObjectId.class))).thenReturn(false);
+		final ObjectId id = ObjectId.get();
+		final Client newClient = Client.ofType(ClientType.PERSON).build();
+		ReflectionTestUtils.setField(newClient, "id", id);
 
-		final ObjectId id = new ObjectId(1000, 2000, (short) 1, 5000);
-		final String UPDATE = String
-				.format("{\"id\":\"%s\",\"firstName\":\"John\",\"lastName\":\"Doe\",\"clientType\":\"COMPANY\"}", id);
-
-		// Expect HTTP 204
-		mvc.perform(put(String.format("/clients/%s", id)).contentType(APPLICATION_JSON_UTF8).content(UPDATE))
-				.andExpect(status().isBadRequest());
+		// When
+		// Then
+		assertThatThrownBy(() -> controller.updateClient(newClient.getId(), newClient))
+				.isInstanceOf(ClientResourceException.class).hasMessageContaining("Client does not exist");
 	}
 
 	@Test
-	public void shouldDeleteAnExistingClient() throws Exception {
+	public void shouldDeleteAnExistingClient() {
 
-		given(repo.exists(any(ObjectId.class))).willReturn(true);
+		// Given
+		when(repo.exists(any(ObjectId.class))).thenReturn(true);
+		final ObjectId id = ObjectId.get();
 
-		final ObjectId id = new ObjectId(1000, 2000, (short) 1, 5000);
+		// When
+		final ResponseEntity<?> response = controller.deleteClient(id);
 
-		// Expect HTTP 204
-		mvc.perform(delete(String.format("/clients/%s", id))).andExpect(status().isNoContent());
+		// Then
+		assertThat(response.getStatusCode()).isEqualTo(NO_CONTENT);
 	}
 
 	@Test
-	public void shouldDeleteExistingClientAndIgnoreFollowingCalls() throws Exception {
+	public void shouldDeleteExistingClientAndIgnoreSubsequentCalls() throws Exception {
 
-		given(repo.exists(any(ObjectId.class))).willReturn(true).willReturn(false);
+		// Given
+		when(repo.exists(any(ObjectId.class))).thenReturn(true).thenReturn(false);
+		final ObjectId id = ObjectId.get();
 
-		final ObjectId id = new ObjectId(1000, 2000, (short) 1, 5000);
+		// When
+		final ResponseEntity<?> response1 = controller.deleteClient(id);
+		final ResponseEntity<?> response2 = controller.deleteClient(id);
+		final ResponseEntity<?> response3 = controller.deleteClient(id);
+
+		// Then
 
 		// Expect HTTP 204 for each call
-		mvc.perform(delete(String.format("/clients/%s", id))).andExpect(status().isNoContent());
-		mvc.perform(delete(String.format("/clients/%s", id))).andExpect(status().isNoContent());
-		mvc.perform(delete(String.format("/clients/%s", id))).andExpect(status().isNoContent());
+		assertThat(response1.getStatusCode()).isEqualTo(NO_CONTENT);
+		assertThat(response2.getStatusCode()).isEqualTo(NO_CONTENT);
+		assertThat(response3.getStatusCode()).isEqualTo(NO_CONTENT);
 	}
+
 }
