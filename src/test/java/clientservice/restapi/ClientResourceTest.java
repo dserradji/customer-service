@@ -113,7 +113,7 @@ public class ClientResourceTest {
 		// When
 		final ResponseEntity<?> response = controller.updateClient(existingClient.getId(), existingClient);
 
-		// Expect HTTP 204
+		// Then
 		assertThat(response.getStatusCode()).isEqualTo(NO_CONTENT);
 	}
 
@@ -159,8 +159,6 @@ public class ClientResourceTest {
 		final ResponseEntity<?> response3 = controller.deleteClient(id);
 
 		// Then
-
-		// Expect HTTP 204 for each call
 		assertThat(response1.getStatusCode()).isEqualTo(NO_CONTENT);
 		assertThat(response2.getStatusCode()).isEqualTo(NO_CONTENT);
 		assertThat(response3.getStatusCode()).isEqualTo(NO_CONTENT);
