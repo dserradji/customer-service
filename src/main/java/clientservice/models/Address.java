@@ -2,6 +2,9 @@ package clientservice.models;
 
 import java.util.Objects;
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+
 /**
  * {@code Address} is an immutable object.
  * <p>
@@ -16,6 +19,7 @@ import java.util.Objects;
  * {@code address = Address.from(address).streetNumber(200).build();}
  *
  */
+@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 public final class Address {
 
 	private int streetNumber;
