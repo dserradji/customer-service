@@ -53,8 +53,8 @@ public class ClientResourceIntegrationTest {
 
 		// Expect HTTP 200
 		mvc.perform(get("/clients").accept(APPLICATION_JSON_UTF8)).andExpect(status().isOk())
-				.andExpect(content().contentType(APPLICATION_JSON_UTF8)).andExpect(jsonPath("$..clientType").isArray())
-				.andExpect(jsonPath("$..clientType").value(hasItems(PERSON.toString(), COMPANY.toString())));
+				.andExpect(content().contentType(APPLICATION_JSON_UTF8)).andExpect(jsonPath("$..client_type").isArray())
+				.andExpect(jsonPath("$..client_type").value(hasItems(PERSON.toString(), COMPANY.toString())));
 	}
 
 	@Test
@@ -88,7 +88,7 @@ public class ClientResourceIntegrationTest {
 		given(repo.save(any(Client.class))).willReturn(newClient);
 
 		// Expect HTTP 201
-		mvc.perform(post("/clients").contentType(APPLICATION_JSON_UTF8).content("{\"clientType\":\"PERSON\"}"))
+		mvc.perform(post("/clients").contentType(APPLICATION_JSON_UTF8).content("{\"client_type\":\"PERSON\"}"))
 				.andExpect(status().isCreated())
 				.andExpect(header().string("Location", is(equalTo(String.format("/clients/%s", id)))));
 	}
@@ -110,7 +110,7 @@ public class ClientResourceIntegrationTest {
 		final ObjectId id = ObjectId.get();
 
 		// Expect HTTP 400
-		final String EXISTING_CLIENT = String.format("{\"id\":\"%s\",\"clientType\":\"COMPANY\"}", id);
+		final String EXISTING_CLIENT = String.format("{\"id\":\"%s\",\"client_type\":\"COMPANY\"}", id);
 		mvc.perform(post("/clients").contentType(APPLICATION_JSON_UTF8).content(EXISTING_CLIENT))
 				.andExpect(status().isBadRequest());
 	}
@@ -123,7 +123,7 @@ public class ClientResourceIntegrationTest {
 
 		final ObjectId id = ObjectId.get();
 		final String UPDATE = String
-				.format("{\"id\":\"%s\",\"firstName\":\"John\",\"lastName\":\"Doe\",\"clientType\":\"COMPANY\"}", id);
+				.format("{\"id\":\"%s\",\"first_name\":\"John\",\"last_name\":\"Doe\",\"client_type\":\"COMPANY\"}", id);
 
 		// Expect HTTP 204
 		mvc.perform(put(String.format("/clients/%s", id)).contentType(APPLICATION_JSON_UTF8).content(UPDATE))
@@ -137,7 +137,7 @@ public class ClientResourceIntegrationTest {
 
 		final ObjectId id = ObjectId.get();
 		final String UPDATE = String
-				.format("{\"id\":\"%s\",\"firstName\":\"John\",\"lastName\":\"Doe\",\"clientType\":\"COMPANY\"}", id);
+				.format("{\"id\":\"%s\",\"first_name\":\"John\",\"last_name\":\"Doe\",\"client_type\":\"COMPANY\"}", id);
 
 		// Expect HTTP 204
 		mvc.perform(put(String.format("/clients/%s", id)).contentType(APPLICATION_JSON_UTF8).content(UPDATE))
