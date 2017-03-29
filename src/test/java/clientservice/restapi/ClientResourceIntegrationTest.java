@@ -96,7 +96,7 @@ public class ClientResourceIntegrationTest {
 	@Test
 	public void shouldNotAddClientIfContentIsNotValid() throws Exception {
 
-		final String BAD_JSON = "{\"bad_property\":\"PERSON\"}";
+		final String BAD_JSON = "{\"client_type_is_missing\":\"PERSON\"}";
 
 		// Expect HTTP 400
 		mvc.perform(post("/clients").contentType(APPLICATION_JSON_UTF8).content(BAD_JSON))

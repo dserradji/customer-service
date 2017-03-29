@@ -7,9 +7,6 @@ import java.util.Objects;
 
 import javax.validation.constraints.NotNull;
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
-
 import clientservice.models.enums.ClientType;
 import clientservice.models.enums.Gender;
 import clientservice.models.enums.MaritalStatus;
@@ -28,10 +25,7 @@ import clientservice.models.enums.PhoneType;
  * {@code Client client = Client.ofType(ClientType.PERSON).firstName("Ken").build();}<br>
  * {@code client = Client.from(client).firstName("Bison").build();}
  */
-@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 public final class Client extends AbstractEntity {
-
-	private static final long serialVersionUID = -5104358321693677796L;
 
 	private String firstName;
 	private String lastName;
@@ -45,7 +39,7 @@ public final class Client extends AbstractEntity {
 	private ClientType clientType;
 
 	private Client() {
-		// Spring Data and Spring MVC need a default constructor
+		// Spring Data needs a default constructor
 		phones = new HashMap<>();
 	}
 
