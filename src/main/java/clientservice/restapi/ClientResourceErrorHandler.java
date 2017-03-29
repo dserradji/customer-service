@@ -26,11 +26,7 @@ public class ClientResourceErrorHandler {
 	
 	@ExceptionHandler(Exception.class)
 	ResponseEntity<?> handleControllerException(HttpServletRequest request, Exception ex) {
-		
-		final Integer statusCode = (Integer) request.getAttribute("javax.servlet.error.status_code");
-		final HttpStatus status = (statusCode == null ? INTERNAL_SERVER_ERROR : valueOf(statusCode));
-		
-		return new ResponseEntity<>(ex.getMessage(), status);
+		return new ResponseEntity<>(ex.getMessage(), INTERNAL_SERVER_ERROR);
 	}
 	
 }
