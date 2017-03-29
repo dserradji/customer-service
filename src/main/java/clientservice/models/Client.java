@@ -7,6 +7,8 @@ import java.util.Objects;
 
 import javax.validation.constraints.NotNull;
 
+import org.bson.types.ObjectId;
+
 import clientservice.models.enums.ClientType;
 import clientservice.models.enums.Gender;
 import clientservice.models.enums.MaritalStatus;
@@ -43,8 +45,10 @@ public final class Client extends AbstractEntity {
 		phones = new HashMap<>();
 	}
 
-	private Client(String firstName, String lastName, Gender gender, LocalDate birthDate, MaritalStatus maritalStatus,
-			Address address, Map<PhoneType, String> phones, String email, ClientType clientType) {
+	private Client(ObjectId id, String firstName, String lastName, Gender gender, LocalDate birthDate,
+			MaritalStatus maritalStatus, Address address, Map<PhoneType, String> phones, String email,
+			ClientType clientType) {
+		this.id = id;
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.gender = gender;
@@ -122,6 +126,7 @@ public final class Client extends AbstractEntity {
 	static public Builder from(Client client) {
 
 		final Builder builder = new Builder(client.clientType);
+		builder.id = client.id;
 		builder.firstName = client.firstName;
 		builder.lastName = client.lastName;
 		builder.gender = client.gender;
@@ -136,6 +141,7 @@ public final class Client extends AbstractEntity {
 
 	static public final class Builder {
 
+		private ObjectId id;
 		private String firstName;
 		private String lastName;
 		private Gender gender;
@@ -206,7 +212,7 @@ public final class Client extends AbstractEntity {
 		}
 
 		public Client build() {
-			return new Client(firstName, lastName, gender, birthDate, maritalStatus, address, phones, email,
+			return new Client(id, firstName, lastName, gender, birthDate, maritalStatus, address, phones, email,
 					clientType);
 		}
 	}

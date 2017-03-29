@@ -14,9 +14,9 @@ import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 @SpringBootApplication
-public class ApplicationConfig {
+public class ClientService {
 
-	/* Customize then Java <--> JSON mapper */
+	/* Customize the Java <--> JSON mapper */
 	@Bean
 	public Jackson2ObjectMapperBuilderCustomizer customizeObjectMapper() {
 		return new Jackson2ObjectMapperBuilderCustomizer() {
@@ -28,7 +28,7 @@ public class ApplicationConfig {
 				builder.modules(new JavaTimeModule());
 				builder.featuresToDisable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 				
-				/* snake_case naming convention */
+				/* Use snake_case naming convention */
 				builder.propertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE);
 				
 				/* Output ObjectId as a String (toString()) not as an object */
@@ -37,13 +37,13 @@ public class ApplicationConfig {
 				/* Don't output null fields*/
 				builder.serializationInclusion(Include.NON_NULL);
 				
-				/* Pretty JSON */
+				/* Print pretty JSON */
 				builder.indentOutput(true);
 			}};
 		
 	}
 	
 	public static void main(String[] args) {
-		SpringApplication.run(ApplicationConfig.class, args);
+		SpringApplication.run(ClientService.class, args);
 	}
 }

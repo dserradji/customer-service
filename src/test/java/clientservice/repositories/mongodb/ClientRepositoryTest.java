@@ -11,12 +11,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import clientservice.ApplicationConfig;
+import clientservice.ClientService;
 import clientservice.models.Address;
 import clientservice.models.Client;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = ApplicationConfig.class)
+@ContextConfiguration(classes = ClientService.class)
 public class ClientRepositoryTest {
 
 	@Autowired
