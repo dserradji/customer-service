@@ -2,6 +2,7 @@ package clientservice.restapi;
 
 import static clientservice.models.enums.ClientType.COMPANY;
 import static clientservice.models.enums.ClientType.PERSON;
+import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
@@ -9,7 +10,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.head;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -17,9 +19,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.Arrays;
+import java.time.LocalDate;
+import java.time.Month;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.bson.types.ObjectId;
 import org.junit.Test;
@@ -47,7 +51,7 @@ public class ClientResourceIntegrationTest {
 	@Test
 	public void shouldReturnAllClients() throws Exception {
 
-		final List<Client> clients = Arrays.asList(Client.ofType(PERSON).build(), Client.ofType(COMPANY).build());
+		final List<Client> clients = asList(Client.ofType(PERSON).build(), Client.ofType(COMPANY).build());
 
 		given(repo.findAll()).willReturn(clients);
 
@@ -55,6 +59,32 @@ public class ClientResourceIntegrationTest {
 		mvc.perform(get("/clients").accept(APPLICATION_JSON_UTF8)).andExpect(status().isOk())
 				.andExpect(content().contentType(APPLICATION_JSON_UTF8)).andExpect(jsonPath("$..client_type").isArray())
 				.andExpect(jsonPath("$..client_type").value(hasItems(PERSON.toString(), COMPANY.toString())));
+	}
+
+	@Test
+	public void shouldReturnOneClientById() throws Exception {
+
+		final LocalDate birthDate = LocalDate.of(1990, Month.JULY, 31);
+		final Client client = Client.ofType(PERSON).birthDate(birthDate).build();
+		final ObjectId id = ObjectId.get();
+
+		given(repo.findOne(any(ObjectId.class))).willReturn(Optional.of(client));
+
+		// Expect HTTP 200
+		mvc.perform(get(String.format("/clients/%s", id)).accept(APPLICATION_JSON_UTF8)).andExpect(status().isOk())
+				.andExpect(content().contentType(APPLICATION_JSON_UTF8))
+				.andExpect(jsonPath("$..client_type").value("PERSON"))
+				.andExpect(jsonPath("$..birth_date").value("1990-07-31"));
+	}
+
+	@Test
+	public void shouldReturn404IfClientNotFound() throws Exception {
+
+		given(repo.findOne(any(ObjectId.class))).willReturn(Optional.empty());
+
+		// Expect HTTP 404
+		mvc.perform(get(String.format("/clients/%s", ObjectId.get())).accept(APPLICATION_JSON_UTF8))
+				.andExpect(status().isNotFound()).andExpect(content().string(""));
 	}
 
 	@Test
@@ -69,7 +99,7 @@ public class ClientResourceIntegrationTest {
 	@Test
 	public void shouldReturnHeadersOnly() throws Exception {
 
-		final List<Client> clients = Arrays.asList(Client.ofType(PERSON).build(), Client.ofType(COMPANY).build());
+		final List<Client> clients = asList(Client.ofType(PERSON).build(), Client.ofType(COMPANY).build());
 
 		given(repo.findAll()).willReturn(clients);
 
@@ -122,8 +152,8 @@ public class ClientResourceIntegrationTest {
 		given(repo.save(any(Client.class))).willReturn(Client.ofType(PERSON).build());
 
 		final ObjectId id = ObjectId.get();
-		final String UPDATE = String
-				.format("{\"id\":\"%s\",\"first_name\":\"John\",\"last_name\":\"Doe\",\"client_type\":\"COMPANY\"}", id);
+		final String UPDATE = String.format(
+				"{\"id\":\"%s\",\"first_name\":\"John\",\"last_name\":\"Doe\",\"client_type\":\"COMPANY\"}", id);
 
 		// Expect HTTP 204
 		mvc.perform(put(String.format("/clients/%s", id)).contentType(APPLICATION_JSON_UTF8).content(UPDATE))
@@ -136,8 +166,8 @@ public class ClientResourceIntegrationTest {
 		given(repo.exists(any(ObjectId.class))).willReturn(false);
 
 		final ObjectId id = ObjectId.get();
-		final String UPDATE = String
-				.format("{\"id\":\"%s\",\"first_name\":\"John\",\"last_name\":\"Doe\",\"client_type\":\"COMPANY\"}", id);
+		final String UPDATE = String.format(
+				"{\"id\":\"%s\",\"first_name\":\"John\",\"last_name\":\"Doe\",\"client_type\":\"COMPANY\"}", id);
 
 		// Expect HTTP 204
 		mvc.perform(put(String.format("/clients/%s", id)).contentType(APPLICATION_JSON_UTF8).content(UPDATE))

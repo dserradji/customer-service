@@ -1,6 +1,10 @@
 package clientservice.restapi;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
+import static org.springframework.http.ResponseEntity.created;
+import static org.springframework.http.ResponseEntity.noContent;
+import static org.springframework.http.ResponseEntity.notFound;
+import static org.springframework.http.ResponseEntity.ok;
 import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
@@ -45,7 +49,13 @@ public class ClientResource {
 	public ResponseEntity<?> allClients() {
 
 		final Iterable<Client> it = repo.findAll();
-		return it.iterator().hasNext() ? ResponseEntity.ok(it) : ResponseEntity.noContent().build();
+		return it.iterator().hasNext() ? ok(it) : noContent().build();
+	}
+
+	@RequestMapping(method = GET, value = "/{id}")
+	public ResponseEntity<?> oneClient(@PathVariable @NotNull ObjectId id) {
+
+		return repo.findOne(id).map(client -> ok(client)).orElse(notFound().build());
 	}
 
 	@RequestMapping(method = POST, consumes = { APPLICATION_JSON_UTF8_VALUE })
@@ -57,7 +67,7 @@ public class ClientResource {
 		}
 
 		final Client created = repo.save(newClient);
-		return ResponseEntity.created(URI.create(String.format("/clients/%s", created.getId()))).build();
+		return created(URI.create(String.format("/clients/%s", created.getId()))).build();
 	}
 
 	/**
@@ -83,7 +93,7 @@ public class ClientResource {
 		}
 
 		repo.save(update);
-		return ResponseEntity.noContent().build();
+		return noContent().build();
 	}
 
 	/**
@@ -104,6 +114,6 @@ public class ClientResource {
 			repo.delete(id);
 		}
 
-		return ResponseEntity.noContent().build();
+		return noContent().build();
 	}
 }

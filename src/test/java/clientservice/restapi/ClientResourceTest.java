@@ -9,11 +9,13 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.bson.types.ObjectId;
 import org.junit.Test;
@@ -64,6 +66,35 @@ public class ClientResourceTest {
 
 		// Then
 		assertThat(response.getStatusCode()).isEqualTo(NO_CONTENT);
+	}
+
+	@Test
+	public void shouldReturnOneClientById() {
+
+		// Given
+		final Client client = Client.ofType(PERSON).build();
+		when(repo.findOne(any(ObjectId.class))).thenReturn(Optional.of(client));
+
+		// When
+		final ResponseEntity<?> response = controller.oneClient(ObjectId.get());
+
+		// Then
+		assertThat(response.getStatusCode()).isEqualTo(OK);
+		assertThat((Client) response.getBody()).isEqualTo(client);
+	}
+
+	@Test
+	public void shouldReturn404IfClientNotFound() {
+
+		// Given
+		when(repo.findOne(any(ObjectId.class))).thenReturn(Optional.empty());
+
+		// When
+		final ResponseEntity<?> response = controller.oneClient(ObjectId.get());
+
+		// Then
+		assertThat(response.getStatusCode()).isEqualTo(NOT_FOUND);
+		assertThat(response.getBody()).isNull();
 	}
 
 	@Test
