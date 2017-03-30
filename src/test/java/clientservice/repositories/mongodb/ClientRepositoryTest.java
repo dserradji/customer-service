@@ -22,11 +22,16 @@ public class ClientRepositoryTest {
 	@Autowired
 	private ClientRepository repo;
 
+	/**
+	 * Class level @DirtiesContext(classMode=ClassMode.BEFORE_EACH_TEST_METHOD)
+	 * can be used instead of this method to reset the context for each test but
+	 * execution will be much slower.
+	 */
 	@After
 	public void cleanDB() {
 		repo.deleteAll();
 	}
-	
+
 	@Test
 	public void shouldCreateAPersonWithId() {
 
