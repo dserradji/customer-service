@@ -68,6 +68,13 @@ public class ClientResource {
 		return repo.findOne(id).map(client -> ok(client)).orElse(notFound().build());
 	}
 
+	/**
+	 * Create a new client.
+	 * 
+	 * @param newClient The client to create.
+	 * 
+	 * @return HTTP 201 with empty body and the header Location containing the URL of the created client.
+	 */
 	@RequestMapping(method = POST, consumes = { APPLICATION_JSON_UTF8_VALUE })
 	public ResponseEntity<?> addClient(@RequestBody @Valid Client newClient) {
 
