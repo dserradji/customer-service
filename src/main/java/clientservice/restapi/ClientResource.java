@@ -37,11 +37,12 @@ public class ClientResource {
 	}
 
 	/**
-	 * Return all existing clients.
+	 * Query for the list of all clients.
 	 * <p>
 	 * This method is idempotent.
 	 * 
-	 * @return A list of clients
+	 * @return HTTP 200 and the body containing all clients or HTTP 204 with
+	 *         empty body.
 	 */
 	@RequestMapping(method = GET)
 	public ResponseEntity<?> allClients() {
@@ -50,6 +51,17 @@ public class ClientResource {
 		return it.iterator().hasNext() ? ok(it) : noContent().build();
 	}
 
+	/**
+	 * Query for the client with the given Id.
+	 * <p>
+	 * This method is idempotent.
+	 * 
+	 * @param id
+	 *            The id of the client.
+	 * 
+	 * @return HTTP 200 and the body containing the client or 404 if the client
+	 *         is not found
+	 */
 	@RequestMapping(method = GET, value = "/{id}")
 	public ResponseEntity<?> oneClient(@PathVariable @NotNull ObjectId id) {
 
@@ -69,18 +81,18 @@ public class ClientResource {
 	}
 
 	/**
-	 * Updates an existing client.
+	 * Update an existing client.
 	 * <p>
 	 * This method is idempotent.
 	 * <p>
 	 * 
 	 * @param id
-	 *            The id of the client to update
+	 *            The id of the client to update.
 	 * @param update
 	 *            The Client object containing the updated version to be
-	 *            persisted
+	 *            persisted.
 	 * 
-	 * @return
+	 * @return 204 with empty body or 400 if the client does not exist. 
 	 */
 	@RequestMapping(method = PUT, value = "/{id}", consumes = { APPLICATION_JSON_UTF8_VALUE })
 	public ResponseEntity<?> updateClient(@PathVariable @NotNull ObjectId id, @RequestBody @Valid Client update) {
@@ -95,15 +107,15 @@ public class ClientResource {
 	}
 
 	/**
-	 * Deletes a client identified by its id.
+	 * Delete a client.
 	 * <p>
 	 * This method is idempotent, if it's called multiples times with the same
 	 * id then the first call will delete the client and subsequent calls will
 	 * be silently ignored.
 	 * 
 	 * @param id
-	 *            The id of the client to delete
-	 * @return
+	 *            The id of the client to delete.
+	 * @return 204 with empty body.
 	 */
 	@RequestMapping(method = DELETE, value = "/{id}")
 	public ResponseEntity<?> deleteClient(@PathVariable @NotNull ObjectId id) {
