@@ -15,14 +15,28 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+
+import javax.annotation.PostConstruct;
+import javax.net.ssl.SSLContext;
+
+import org.apache.http.client.HttpClient;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.ssl.SSLContextBuilder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import clientservice.models.Client;
@@ -45,8 +59,27 @@ public class ClientServiceTest {
 	@Autowired
 	private TestRestTemplate restTemplate;
 
+	/**
+	 * This is necessary for the self signed certificate to be trusted.
+	 * 
+	 * @throws KeyManagementException
+	 * @throws NoSuchAlgorithmException
+	 * @throws KeyStoreException
+	 */
+	@PostConstruct
+	void init() throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException {
+		
+		final SSLContextBuilder ctxBuilder = SSLContextBuilder.create();
+		final SSLContext sslCtx = ctxBuilder.loadTrustMaterial(new TrustSelfSignedStrategy()).build();
+		final SSLConnectionSocketFactory factory = new SSLConnectionSocketFactory(sslCtx);
+		final HttpClient httpClient = HttpClients.custom().setSSLSocketFactory(factory).build();
+
+		((HttpComponentsClientHttpRequestFactory) restTemplate.getRestTemplate().getRequestFactory())
+				.setHttpClient(httpClient);
+	}
+
 	@Test
-	public void testCRUDOperationsAllTogether() throws Exception {
+	public void testCRUDOperationsAllTogether() {
 
 		final HttpHeaders headers = new HttpHeaders();
 		headers.add(ACCEPT, APPLICATION_JSON_UTF8_VALUE);
