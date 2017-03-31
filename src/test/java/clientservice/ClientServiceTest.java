@@ -18,6 +18,8 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.time.LocalDate;
+import java.time.Month;
 
 import javax.annotation.PostConstruct;
 import javax.net.ssl.SSLContext;
@@ -32,7 +34,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -68,7 +69,7 @@ public class ClientServiceTest {
 	 */
 	@PostConstruct
 	void init() throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException {
-		
+
 		final SSLContextBuilder ctxBuilder = SSLContextBuilder.create();
 		final SSLContext sslCtx = ctxBuilder.loadTrustMaterial(new TrustSelfSignedStrategy()).build();
 		final SSLConnectionSocketFactory factory = new SSLConnectionSocketFactory(sslCtx);
@@ -84,7 +85,7 @@ public class ClientServiceTest {
 		final HttpHeaders headers = new HttpHeaders();
 		headers.add(ACCEPT, APPLICATION_JSON_UTF8_VALUE);
 		headers.add(CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE);
-		final Client newClient = Client.ofType(PERSON).build();
+		final Client newClient = Client.ofType(PERSON).birthDate(LocalDate.of(1990, Month.AUGUST, 16)).build();
 
 		// ---------- Create ----------
 		HttpEntity<?> request = new HttpEntity<>(newClient, headers);
