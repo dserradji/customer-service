@@ -15,6 +15,7 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 
+import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -32,6 +33,7 @@ import org.apache.http.ssl.SSLContextBuilder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpEntity;
@@ -39,6 +41,10 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 import clientservice.models.Client;
 
@@ -53,22 +59,36 @@ import clientservice.models.Client;
  * @author Djallal Serradji
  *
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = RANDOM_PORT)
+//@RunWith(SpringRunner.class)
+//@SpringBootTest(webEnvironment = RANDOM_PORT)
 public class ClientServiceTest {
+
+	@Value("${security.user.name}")
+	private String username;
+
+	@Value("${security.user.password}")
+	private String password;
+
+	@Value("${security.oauth2.client.client-id}")
+	private String clientId;
+
+	@Value("${security.oauth2.client.client-secret}")
+	private String clientSecret;
 
 	@Autowired
 	private TestRestTemplate restTemplate;
 
 	/**
-	 * This is necessary for the self signed certificate to be trusted.
+	 * This is necessary for the self signed certificate to be trusted.<br>
+	 * It has no effect if SSL is not active.
 	 * 
 	 * @throws KeyManagementException
 	 * @throws NoSuchAlgorithmException
 	 * @throws KeyStoreException
+	 * @throws IOException
 	 */
 	@PostConstruct
-	void init() throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException {
+	void init() throws Exception {
 
 		final SSLContextBuilder ctxBuilder = SSLContextBuilder.create();
 		final SSLContext sslCtx = ctxBuilder.loadTrustMaterial(new TrustSelfSignedStrategy()).build();
@@ -80,11 +100,14 @@ public class ClientServiceTest {
 	}
 
 	@Test
-	public void testCRUDOperationsAllTogether() {
+	public void testCRUDOperationsAllTogether() throws IOException {
 
+		// Prepare HTTP headers used for requests
 		final HttpHeaders headers = new HttpHeaders();
 		headers.add(ACCEPT, APPLICATION_JSON_UTF8_VALUE);
 		headers.add(CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE);
+		headers.add("Authorization", String.format("Bearer %s", requestToken()));
+
 		final Client newClient = Client.ofType(PERSON).birthDate(LocalDate.of(1990, Month.AUGUST, 16)).build();
 
 		// ---------- Create ----------
@@ -123,5 +146,19 @@ public class ClientServiceTest {
 		assertThat(response.getBody()).isNull();
 		response = restTemplate.exchange(newClientUrl, GET, request, Client.class);
 		assertThat(response.getStatusCode()).isEqualTo(NOT_FOUND);
+	}
+
+	private String requestToken() throws IOException {
+
+		final MultiValueMap<String, String> postParams = new LinkedMultiValueMap<>();
+		postParams.add("username", username);
+		postParams.add("password", password);
+		postParams.add("grant_type", "password");
+
+		final JsonNode resp = restTemplate
+				.withBasicAuth(clientId, clientSecret)
+				.postForObject("/oauth/token", postParams, JsonNode.class);
+
+		return resp.get("access_token").asText();
 	}
 }
