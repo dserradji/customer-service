@@ -31,6 +31,7 @@ public class ClientService extends AuthorizationServerConfigurerAdapter {
 		endpoints.authenticationManager(authenticationManager);
 	}
 
+	/* OAuth2 in memory credentials */
 	@Override
 	public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
 		clients.inMemory().withClient("clientId").secret("clientSecret").scopes("read", "read-all", "write").and()

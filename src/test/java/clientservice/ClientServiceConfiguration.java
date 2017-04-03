@@ -14,7 +14,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.Authentication;
 
 @Configuration
-public class ClientServiceTestConfiguration extends WebSecurityConfigurerAdapter {
+public class ClientServiceConfiguration extends WebSecurityConfigurerAdapter {
 
 	/**
 	 * Authorize all requests and use a custom

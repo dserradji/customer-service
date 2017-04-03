@@ -37,13 +37,13 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 
-import clientservice.ClientServiceTestConfiguration;
+import clientservice.ClientServiceConfiguration;
 import clientservice.models.Client;
 import clientservice.repositories.mongodb.ClientRepository;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(controllers = { ClientResource.class })
-@ContextConfiguration(classes = ClientServiceTestConfiguration.class)
+@ContextConfiguration(classes = ClientServiceConfiguration.class)
 @ComponentScan
 public class ClientResourceIntegrationTest {
 
