@@ -31,15 +31,20 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 
+import clientservice.ClientServiceTestConfiguration;
 import clientservice.models.Client;
 import clientservice.repositories.mongodb.ClientRepository;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest(ClientResource.class)
+@WebMvcTest(controllers = { ClientResource.class })
+@ContextConfiguration(classes = ClientServiceTestConfiguration.class)
+@ComponentScan
 public class ClientResourceIntegrationTest {
 
 	@MockBean

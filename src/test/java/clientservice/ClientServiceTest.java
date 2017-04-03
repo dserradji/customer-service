@@ -33,7 +33,6 @@ import org.apache.http.ssl.SSLContextBuilder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpEntity;
@@ -59,21 +58,9 @@ import clientservice.models.Client;
  * @author Djallal Serradji
  *
  */
-//@RunWith(SpringRunner.class)
-//@SpringBootTest(webEnvironment = RANDOM_PORT)
+@RunWith(SpringRunner.class)
+@SpringBootTest(webEnvironment = RANDOM_PORT)
 public class ClientServiceTest {
-
-	@Value("${security.user.name}")
-	private String username;
-
-	@Value("${security.user.password}")
-	private String password;
-
-	@Value("${security.oauth2.client.client-id}")
-	private String clientId;
-
-	@Value("${security.oauth2.client.client-secret}")
-	private String clientSecret;
 
 	@Autowired
 	private TestRestTemplate restTemplate;
@@ -108,7 +95,9 @@ public class ClientServiceTest {
 		headers.add(CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE);
 		headers.add("Authorization", String.format("Bearer %s", requestToken()));
 
-		final Client newClient = Client.ofType(PERSON).birthDate(LocalDate.of(1990, Month.AUGUST, 16)).build();
+		final Client newClient = Client.ofType(PERSON)
+				.birthDate(LocalDate.of(1990, Month.AUGUST, 16))
+				.build();
 
 		// ---------- Create ----------
 		HttpEntity<?> request = new HttpEntity<>(newClient, headers);
@@ -151,12 +140,10 @@ public class ClientServiceTest {
 	private String requestToken() throws IOException {
 
 		final MultiValueMap<String, String> postParams = new LinkedMultiValueMap<>();
-		postParams.add("username", username);
-		postParams.add("password", password);
-		postParams.add("grant_type", "password");
+		postParams.add("grant_type", "client_credentials");
 
 		final JsonNode resp = restTemplate
-				.withBasicAuth(clientId, clientSecret)
+				.withBasicAuth("clientId", "clientSecret")
 				.postForObject("/oauth/token", postParams, JsonNode.class);
 
 		return resp.get("access_token").asText();
