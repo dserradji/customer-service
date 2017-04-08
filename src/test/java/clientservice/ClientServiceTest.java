@@ -44,6 +44,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import clientservice.models.Client;
 
@@ -64,6 +65,9 @@ public class ClientServiceTest {
 
 	@Autowired
 	private TestRestTemplate restTemplate;
+
+	@Autowired
+	private ObjectMapper mapper;
 
 	/**
 	 * This is necessary for the self signed certificate to be trusted.<br>
@@ -95,13 +99,11 @@ public class ClientServiceTest {
 		headers.add(CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE);
 		headers.add("Authorization", String.format("Bearer %s", requestToken()));
 
-		final Client newClient = Client.ofType(PERSON)
-				.birthDate(LocalDate.of(1990, Month.AUGUST, 16))
-				.build();
+		final Client newClient = Client.ofType(PERSON).birthDate(LocalDate.of(1990, Month.AUGUST, 16)).build();
 
 		// ---------- Create ----------
 		HttpEntity<?> request = new HttpEntity<>(newClient, headers);
-		ResponseEntity<Client> response = restTemplate.exchange("/clients", POST, request, Client.class);
+		ResponseEntity<String> response = restTemplate.exchange("/clients", POST, request, String.class);
 
 		assertThat(response.getStatusCode()).isEqualTo(CREATED);
 		final String newClientUrl = response.getHeaders().get("Location").get(0);
@@ -109,31 +111,32 @@ public class ClientServiceTest {
 
 		// ---------- Read ----------
 		request = new HttpEntity<>(headers);
-		response = restTemplate.exchange(newClientUrl, GET, request, Client.class);
+		response = restTemplate.exchange(newClientUrl, GET, request, String.class);
 
 		assertThat(response.getStatusCode()).isEqualTo(OK);
+		final Client createdClient = mapper.readValue(response.getBody(), Client.class);
 		assertThat(response.getBody()).isNotNull();
-		assertThat(response.getBody().getId()).isNotNull();
+		assertThat(createdClient.getId()).isNotNull();
 
 		// ---------- Update ----------
-		final Client createdClient = response.getBody();
-		final Client updatedClient = Client.from(createdClient).firstName("John").lastName("Doe").build();
-		request = new HttpEntity<>(updatedClient, headers);
-		response = restTemplate.exchange(newClientUrl, PUT, request, Client.class);
+		final Client clientToUpdate = Client.from(createdClient).firstName("John").lastName("Doe").build();
+		request = new HttpEntity<>(clientToUpdate, headers);
+		response = restTemplate.exchange(newClientUrl, PUT, request, String.class);
 
 		assertThat(response.getStatusCode()).isEqualTo(NO_CONTENT);
 		assertThat(response.getBody()).isNull();
-		response = restTemplate.exchange(newClientUrl, GET, request, Client.class);
+		response = restTemplate.exchange(newClientUrl, GET, request, String.class);
 		assertThat(response.getStatusCode()).isEqualTo(OK);
-		assertThat(response.getBody().getId()).isEqualTo(updatedClient.getId());
-		assertThat(response.getBody().getLastName()).isEqualTo("Doe");
+		final Client updatedClient = mapper.readValue(response.getBody(), Client.class);
+		assertThat(updatedClient.getId()).isEqualTo(updatedClient.getId());
+		assertThat(updatedClient.getLastName()).isEqualTo("Doe");
 
 		// ---------- Delete ----------
-		response = restTemplate.exchange(newClientUrl, DELETE, request, Client.class);
+		response = restTemplate.exchange(newClientUrl, DELETE, request, String.class);
 
 		assertThat(response.getStatusCode()).isEqualTo(NO_CONTENT);
 		assertThat(response.getBody()).isNull();
-		response = restTemplate.exchange(newClientUrl, GET, request, Client.class);
+		response = restTemplate.exchange(newClientUrl, GET, request, String.class);
 		assertThat(response.getStatusCode()).isEqualTo(NOT_FOUND);
 	}
 
@@ -142,9 +145,8 @@ public class ClientServiceTest {
 		final MultiValueMap<String, String> postParams = new LinkedMultiValueMap<>();
 		postParams.add("grant_type", "client_credentials");
 
-		final JsonNode resp = restTemplate
-				.withBasicAuth("clientId", "clientSecret")
-				.postForObject("/oauth/token", postParams, JsonNode.class);
+		final JsonNode resp = restTemplate.withBasicAuth("clientId", "clientSecret").postForObject("/oauth/token",
+				postParams, JsonNode.class);
 
 		return resp.get("access_token").asText();
 	}

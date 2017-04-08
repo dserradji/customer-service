@@ -9,6 +9,8 @@ import javax.validation.constraints.NotNull;
 
 import org.bson.types.ObjectId;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
 import clientservice.models.enums.ClientType;
 import clientservice.models.enums.Gender;
 import clientservice.models.enums.MaritalStatus;
@@ -27,6 +29,7 @@ import clientservice.models.enums.PhoneType;
  * {@code Client client = Client.ofType(ClientType.PERSON).firstName("Ken").build();}<br>
  * {@code client = Client.from(client).firstName("Bison").build();}
  */
+@JsonDeserialize(using = ClientDeserializer.class)
 public final class Client extends AbstractEntity {
 
 	private String firstName;
@@ -155,6 +158,11 @@ public final class Client extends AbstractEntity {
 		public Builder(ClientType clientType) {
 			Objects.requireNonNull(clientType, "Client type can not be null.");
 			this.clientType = clientType;
+		}
+
+		public Builder id(ObjectId id) {
+			this.id = id;
+			return this;
 		}
 
 		public Builder firstName(String firstName) {
