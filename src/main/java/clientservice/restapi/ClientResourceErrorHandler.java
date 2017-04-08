@@ -6,7 +6,6 @@ import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -18,8 +17,8 @@ public class ClientResourceErrorHandler {
 		return new ResponseEntity<>(ex.getMessage(), ex.getHttpStatus());
 	}
 
-	@ExceptionHandler(MethodArgumentNotValidException.class)
-	ResponseEntity<?> handleControllerException(MethodArgumentNotValidException ex) {
+	@ExceptionHandler(IllegalArgumentException.class)
+	ResponseEntity<?> handleControllerException(IllegalArgumentException ex) {
 		return new ResponseEntity<>(ex.getMessage(), BAD_REQUEST);
 	}
 	

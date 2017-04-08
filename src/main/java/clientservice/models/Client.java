@@ -3,9 +3,6 @@ package clientservice.models;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
-
-import javax.validation.constraints.NotNull;
 
 import org.bson.types.ObjectId;
 
@@ -27,7 +24,7 @@ import clientservice.models.enums.PhoneType;
  * <p>
  * Example:<br>
  * {@code Client client = Client.ofType(ClientType.PERSON).firstName("Ken").build();}<br>
- * {@code client = Client.from(client).firstName("Bison").build();}
+ * {@code Client updatedClient = Client.from(client).firstName("Bison").build();}
  */
 @JsonDeserialize(using = ClientDeserializer.class)
 public final class Client extends AbstractEntity {
@@ -40,7 +37,6 @@ public final class Client extends AbstractEntity {
 	private Address address;
 	private Map<PhoneType, String> phones;
 	private String email;
-	@NotNull
 	private ClientType clientType;
 
 	private Client() {
@@ -156,7 +152,9 @@ public final class Client extends AbstractEntity {
 		private ClientType clientType;
 
 		public Builder(ClientType clientType) {
-			Objects.requireNonNull(clientType, "Client type can not be null.");
+			if (clientType == null) {
+				throw new IllegalArgumentException("Client type can not be null.");
+			}
 			this.clientType = clientType;
 		}
 

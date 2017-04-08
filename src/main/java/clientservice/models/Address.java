@@ -1,7 +1,5 @@
 package clientservice.models;
 
-import java.util.Objects;
-
 /**
  * {@code Address} is an immutable object.
  * <p>
@@ -63,7 +61,9 @@ public final class Address {
 		private String country;
 
 		public Builder(String country) {
-			Objects.requireNonNull(country, "Country can not be null.");
+			if (country == null) {
+				throw new IllegalArgumentException("Country can not be null.");
+			}
 			this.country = country;
 		}
 

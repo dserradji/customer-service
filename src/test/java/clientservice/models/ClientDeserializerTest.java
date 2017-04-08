@@ -23,7 +23,6 @@ import clientservice.models.enums.ClientType;
 import clientservice.models.enums.Gender;
 import clientservice.models.enums.MaritalStatus;
 import clientservice.models.enums.PhoneType;
-import clientservice.restapi.ClientResourceException;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
@@ -187,7 +186,7 @@ public class ClientDeserializerTest {
 		final String json = "{\"id\":\"58e94dffebbd721e30c97d3d\"}";
 
 		// When
-		assertThatThrownBy(() -> mapper.readValue(json, Client.class)).isInstanceOf(NullPointerException.class)
+		assertThatThrownBy(() -> mapper.readValue(json, Client.class)).isInstanceOf(IllegalArgumentException.class)
 				.hasMessageContaining("Client type can not be null");
 	}
 
@@ -198,7 +197,7 @@ public class ClientDeserializerTest {
 		final String json = "{\"address\":{\"street_number\":\"100\",\"street_name\":\"Wellington\",\"city\":\"Shadaloo City\",\"zipcode\":\"12345\",\"state_or_province\":\"stateOrProvince\"},\"client_type\":\"PERSON\"}";
 
 		// When
-		assertThatThrownBy(() -> mapper.readValue(json, Client.class)).isInstanceOf(NullPointerException.class)
+		assertThatThrownBy(() -> mapper.readValue(json, Client.class)).isInstanceOf(IllegalArgumentException.class)
 				.hasMessageContaining("Country can not be null");
 	}
 }

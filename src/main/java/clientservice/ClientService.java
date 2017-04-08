@@ -6,11 +6,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 
-@EnableGlobalMethodSecurity(prePostEnabled = true)
 @SpringBootApplication
 public class ClientService {
 
