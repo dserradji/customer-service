@@ -26,6 +26,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import clientservice.ClientServiceException;
 import clientservice.models.Client;
 import clientservice.models.enums.ClientType;
 import clientservice.repositories.mongodb.ClientRepository;
@@ -127,7 +128,7 @@ public class ClientResourceTest {
 
 		// When
 		// Then
-		assertThatThrownBy(() -> controller.addClient(client)).isInstanceOf(ClientResourceException.class)
+		assertThatThrownBy(() -> controller.addClient(client)).isInstanceOf(ClientServiceException.class)
 				.hasMessageContaining("Client already exists");
 	}
 
@@ -160,7 +161,7 @@ public class ClientResourceTest {
 		// When
 		// Then
 		assertThatThrownBy(() -> controller.updateClient(newClient.getId(), newClient))
-				.isInstanceOf(ClientResourceException.class).hasMessageContaining("Client does not exist");
+				.isInstanceOf(ClientServiceException.class).hasMessageContaining("Client does not exist");
 	}
 
 	@Test

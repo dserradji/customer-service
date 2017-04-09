@@ -1,5 +1,9 @@
 package clientservice.models;
 
+import org.springframework.http.HttpStatus;
+
+import clientservice.ClientServiceException;
+
 /**
  * {@code Address} is an immutable object.
  * <p>
@@ -62,7 +66,7 @@ public final class Address {
 
 		public Builder(String country) {
 			if (country == null) {
-				throw new IllegalArgumentException("Country can not be null.");
+				throw new ClientServiceException(HttpStatus.BAD_REQUEST, "Country can not be null.");
 			}
 			this.country = country;
 		}

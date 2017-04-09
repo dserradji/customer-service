@@ -114,8 +114,8 @@ public class ClientServiceTest {
 		response = restTemplate.exchange(newClientUrl, GET, request, String.class);
 
 		assertThat(response.getStatusCode()).isEqualTo(OK);
-		final Client createdClient = mapper.readValue(response.getBody(), Client.class);
 		assertThat(response.getBody()).isNotNull();
+		final Client createdClient = mapper.readValue(response.getBody(), Client.class);
 		assertThat(createdClient.getId()).isNotNull();
 
 		// ---------- Update ----------

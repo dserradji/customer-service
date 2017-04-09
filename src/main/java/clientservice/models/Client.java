@@ -5,9 +5,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bson.types.ObjectId;
+import org.springframework.http.HttpStatus;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
+import clientservice.ClientServiceException;
 import clientservice.models.enums.ClientType;
 import clientservice.models.enums.Gender;
 import clientservice.models.enums.MaritalStatus;
@@ -153,7 +155,7 @@ public final class Client extends AbstractEntity {
 
 		public Builder(ClientType clientType) {
 			if (clientType == null) {
-				throw new IllegalArgumentException("Client type can not be null.");
+				throw new ClientServiceException(HttpStatus.BAD_REQUEST, "Client type can not be null.");
 			}
 			this.clientType = clientType;
 		}

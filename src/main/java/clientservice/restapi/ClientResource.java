@@ -18,11 +18,13 @@ import javax.validation.constraints.NotNull;
 import org.bson.types.ObjectId;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import clientservice.ClientServiceException;
 import clientservice.models.Client;
 import clientservice.repositories.mongodb.ClientRepository;
 
@@ -44,6 +46,7 @@ public class ClientResource {
 	 * @return HTTP 200 and the body containing all clients or HTTP 204 with
 	 *         empty body.
 	 */
+	@PreAuthorize("#oauth2.hasAnyScope('read','write','read-write')")
 	@RequestMapping(method = GET)
 	public ResponseEntity<?> allClients() {
 
@@ -62,6 +65,7 @@ public class ClientResource {
 	 * @return HTTP 200 and the body containing the client or 404 if the client
 	 *         is not found
 	 */
+	@PreAuthorize("#oauth2.hasAnyScope('read','write','read-write')")
 	@RequestMapping(method = GET, value = "/{id}")
 	public ResponseEntity<?> oneClient(@PathVariable @NotNull ObjectId id) {
 
@@ -75,11 +79,12 @@ public class ClientResource {
 	 * 
 	 * @return HTTP 201 with empty body and the header Location containing the URL of the created client.
 	 */
+	@PreAuthorize("#oauth2.hasAnyScope('write','read-write')")
 	@RequestMapping(method = POST, consumes = { APPLICATION_JSON_UTF8_VALUE })
 	public ResponseEntity<?> addClient(@RequestBody @Valid Client newClient) {
 
 		if (newClient.getId() != null && repo.exists(newClient.getId())) {
-			throw new ClientResourceException(HttpStatus.BAD_REQUEST,
+			throw new ClientServiceException(HttpStatus.BAD_REQUEST,
 					"Client already exists, to update an existing client use PUT instead.");
 		}
 
@@ -101,11 +106,12 @@ public class ClientResource {
 	 * 
 	 * @return 204 with empty body or 400 if the client does not exist. 
 	 */
+	@PreAuthorize("#oauth2.hasAnyScope('write','read-write')")
 	@RequestMapping(method = PUT, value = "/{id}", consumes = { APPLICATION_JSON_UTF8_VALUE })
 	public ResponseEntity<?> updateClient(@PathVariable @NotNull ObjectId id, @RequestBody @Valid Client update) {
 
 		if (!repo.exists(id)) {
-			throw new ClientResourceException(HttpStatus.BAD_REQUEST,
+			throw new ClientServiceException(HttpStatus.BAD_REQUEST,
 					"Client does not exist, to create a new client use POST instead.");
 		}
 
@@ -124,6 +130,7 @@ public class ClientResource {
 	 *            The id of the client to delete.
 	 * @return 204 with empty body.
 	 */
+	@PreAuthorize("#oauth2.hasAnyScope('write','read-write')")
 	@RequestMapping(method = DELETE, value = "/{id}")
 	public ResponseEntity<?> deleteClient(@PathVariable @NotNull ObjectId id) {
 

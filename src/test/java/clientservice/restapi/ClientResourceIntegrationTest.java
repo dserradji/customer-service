@@ -29,24 +29,43 @@ import org.bson.types.ObjectId;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 
-import clientservice.ClientServiceConfiguration;
+import clientservice.ClientServiceExceptionHandler;
 import clientservice.models.Client;
 import clientservice.repositories.mongodb.ClientRepository;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(controllers = { ClientResource.class })
-@ContextConfiguration(classes = ClientServiceConfiguration.class)
+@ContextConfiguration(classes = { ClientServiceExceptionHandler.class })
 @ComponentScan
 public class ClientResourceIntegrationTest {
 
+	/**
+	 * Disable Spring Security OAuth2 authentication.
+	 * 
+	 */
+	@Order(SecurityProperties.ACCESS_OVERRIDE_ORDER)
+	@Configuration
+	static class CustomConfig extends WebSecurityConfigurerAdapter {
+
+		@Override
+		public void configure(WebSecurity web) throws Exception {
+			web.ignoring().anyRequest();
+		}
+	}
+	
 	@MockBean
 	private ClientRepository repo;
 
