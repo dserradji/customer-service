@@ -58,14 +58,14 @@ public class ClientResourceIntegrationTest {
 	 */
 	@Order(SecurityProperties.ACCESS_OVERRIDE_ORDER)
 	@Configuration
-	static class CustomConfig extends WebSecurityConfigurerAdapter {
+	static class CustomWebSecurityConfigurer extends WebSecurityConfigurerAdapter {
 
 		@Override
 		public void configure(WebSecurity web) throws Exception {
 			web.ignoring().anyRequest();
 		}
 	}
-	
+
 	@MockBean
 	private ClientRepository repo;
 

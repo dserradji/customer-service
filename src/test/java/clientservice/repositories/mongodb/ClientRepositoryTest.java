@@ -4,7 +4,7 @@ import static clientservice.models.enums.ClientType.COMPANY;
 import static clientservice.models.enums.ClientType.PERSON;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +27,7 @@ public class ClientRepositoryTest {
 	 * can be used instead of this method to reset the context for each test but
 	 * execution will be much slower.
 	 */
-	@After
+	@Before
 	public void cleanDB() {
 		repo.deleteAll();
 	}
