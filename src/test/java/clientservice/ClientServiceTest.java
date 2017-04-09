@@ -99,7 +99,7 @@ public class ClientServiceTest {
 		headers.add(CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE);
 		headers.add("Authorization", String.format("Bearer %s", requestToken()));
 
-		final Client newClient = Client.ofType(PERSON).birthDate(LocalDate.of(1990, Month.AUGUST, 16)).build();
+		final Client newClient = Client.ofType(PERSON).withBirthDate(LocalDate.of(1990, Month.AUGUST, 16)).build();
 
 		// ---------- Create ----------
 		HttpEntity<?> request = new HttpEntity<>(newClient, headers);
@@ -119,7 +119,7 @@ public class ClientServiceTest {
 		assertThat(createdClient.getId()).isNotNull();
 
 		// ---------- Update ----------
-		final Client clientToUpdate = Client.from(createdClient).firstName("John").lastName("Doe").build();
+		final Client clientToUpdate = Client.from(createdClient).withFirstName("John").withLastName("Doe").build();
 		request = new HttpEntity<>(clientToUpdate, headers);
 		response = restTemplate.exchange(newClientUrl, PUT, request, String.class);
 

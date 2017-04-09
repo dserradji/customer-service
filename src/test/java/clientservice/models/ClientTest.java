@@ -25,11 +25,11 @@ public class ClientTest {
 				.city("Shadaloo City").zipcode("123456").build();
 
 		// When
-		client = Client.ofType(ClientType.PERSON).firstName("Ken").lastName("Masters").gender(Gender.MALE)
-				.birthDate(LocalDate.of(1990, Month.MARCH, 16)).maritalStatus(MaritalStatus.SINGLE).address(address)
-				.phone(PhoneType.HOME, "111111111").phone(PhoneType.CELLULAR, "222222222")
-				.phone(PhoneType.OFFICE, "333333333 Ext123").phone(PhoneType.FAX, "444444444")
-				.email("kmasters@streetf.com").build();
+		client = Client.ofType(ClientType.PERSON).withFirstName("Ken").withLastName("Masters").withGender(Gender.MALE)
+				.withBirthDate(LocalDate.of(1990, Month.MARCH, 16)).withMaritalStatus(MaritalStatus.SINGLE).withAddress(address)
+				.withPhone(PhoneType.HOME, "111111111").withPhone(PhoneType.CELLULAR, "222222222")
+				.withPhone(PhoneType.OFFICE, "333333333 Ext123").withPhone(PhoneType.FAX, "444444444")
+				.withEmail("kmasters@streetf.com").build();
 
 		// Then
 		assertThat(client).isNotNull();
@@ -57,10 +57,10 @@ public class ClientTest {
 				.city("Shadaloo City").zipcode("123456").build();
 
 		// When
-		client = Client.ofType(ClientType.COMPANY).lastName("Acme Corp.").address(address)
-				.phone(PhoneType.HOME, "111111111").phone(PhoneType.CELLULAR, "222222222")
-				.phone(PhoneType.OFFICE, "333333333 Ext123").phone(PhoneType.FAX, "444444444")
-				.email("kmasters@streetf.com").build();
+		client = Client.ofType(ClientType.COMPANY).withLastName("Acme Corp.").withAddress(address)
+				.withPhone(PhoneType.HOME, "111111111").withPhone(PhoneType.CELLULAR, "222222222")
+				.withPhone(PhoneType.OFFICE, "333333333 Ext123").withPhone(PhoneType.FAX, "444444444")
+				.withEmail("kmasters@streetf.com").build();
 
 		// Then
 		assertThat(client).isNotNull();
@@ -85,13 +85,13 @@ public class ClientTest {
 		final Address address = Address.ofCountry("Shadaloo").streetNumber(110).streetName("Bison street")
 				.city("Shadaloo City").zipcode("123456").build();
 
-		Client client = Client.ofType(ClientType.COMPANY).lastName("Acme Corp.").address(address)
-				.phone(PhoneType.HOME, "111111111").phone(PhoneType.CELLULAR, "222222222")
-				.phone(PhoneType.OFFICE, "333333333 Ext123").phone(PhoneType.FAX, "444444444")
-				.email("kmasters@streetf.com").build();
+		Client client = Client.ofType(ClientType.COMPANY).withLastName("Acme Corp.").withAddress(address)
+				.withPhone(PhoneType.HOME, "111111111").withPhone(PhoneType.CELLULAR, "222222222")
+				.withPhone(PhoneType.OFFICE, "333333333 Ext123").withPhone(PhoneType.FAX, "444444444")
+				.withEmail("kmasters@streetf.com").build();
 
 		// When
-		client = Client.from(client).lastName("Acme Inc.").build();
+		client = Client.from(client).withLastName("Acme Inc.").build();
 
 		// Then
 		assertThat(client).isNotNull();

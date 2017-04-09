@@ -41,7 +41,7 @@ public class ClientRepositoryTest {
 
 		// When
 		final Client saved = repo
-				.save(Client.ofType(PERSON).firstName("Ken").lastName("Masters").address(address).build());
+				.save(Client.ofType(PERSON).withFirstName("Ken").withLastName("Masters").withAddress(address).build());
 
 		// Then
 		assertThat(saved.getId()).isNotNull();
@@ -56,7 +56,7 @@ public class ClientRepositoryTest {
 		final Address address = Address.ofCountry("Shadaloo").streetNumber(110).streetName("Bison street")
 				.city("Shadaloo City").zipcode("123456").build();
 		final Client saved = repo
-				.save(Client.ofType(PERSON).firstName("Ken").lastName("Masters").address(address).build());
+				.save(Client.ofType(PERSON).withFirstName("Ken").withLastName("Masters").withAddress(address).build());
 
 		// When
 		final Client retrieved = repo.findOne(saved.getId()).get();
@@ -75,10 +75,10 @@ public class ClientRepositoryTest {
 		Address address = Address.ofCountry("Shadaloo").streetNumber(110).streetName("Bison street")
 				.city("Shadaloo City").zipcode("123456").build();
 		final Client saved = repo
-				.save(Client.ofType(PERSON).firstName("Ken").lastName("Masters").address(address).build());
+				.save(Client.ofType(PERSON).withFirstName("Ken").withLastName("Masters").withAddress(address).build());
 		Client retrieved = repo.findOne(saved.getId()).get();
 		address = Address.from(address).zipcode("654321").build();
-		retrieved = Client.from(retrieved).email("kenm@email.com").address(address).build();
+		retrieved = Client.from(retrieved).withEmail("kenm@email.com").withAddress(address).build();
 
 		// When
 		final Client updated = repo.save(retrieved);
@@ -93,7 +93,7 @@ public class ClientRepositoryTest {
 	public void shouldDeleteAPerson() {
 
 		// Given
-		final Client saved = repo.save(Client.ofType(PERSON).firstName("Ken").lastName("Masters").build());
+		final Client saved = repo.save(Client.ofType(PERSON).withFirstName("Ken").withLastName("Masters").build());
 
 		// When
 		repo.delete(saved);
@@ -109,8 +109,8 @@ public class ClientRepositoryTest {
 		// Given
 		final Address address = Address.ofCountry("Shadaloo").streetNumber(110).streetName("Bison street")
 				.city("Shadaloo City").zipcode("123456").build();
-		repo.save(Client.ofType(PERSON).firstName("Ken").lastName("Masters").address(address).build());
-		repo.save(Client.ofType(COMPANY).firstName("Ken").lastName("Masters").address(address).build());
+		repo.save(Client.ofType(PERSON).withFirstName("Ken").withLastName("Masters").withAddress(address).build());
+		repo.save(Client.ofType(COMPANY).withFirstName("Ken").withLastName("Masters").withAddress(address).build());
 
 		// When
 		final Iterable<Client> clients = repo.findAll();

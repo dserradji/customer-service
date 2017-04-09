@@ -42,8 +42,8 @@ public final class Client extends AbstractEntity {
 	private ClientType clientType;
 
 	private Client() {
-		// Spring Data needs a default constructor
-		phones = new HashMap<>();
+		// Needed for Spring Data and Jackson serialization
+//		phones = new HashMap<>();
 	}
 
 	private Client(ObjectId id, String firstName, String lastName, Gender gender, LocalDate birthDate,
@@ -160,37 +160,37 @@ public final class Client extends AbstractEntity {
 			this.clientType = clientType;
 		}
 
-		public Builder id(ObjectId id) {
+		public Builder withId(ObjectId id) {
 			this.id = id;
 			return this;
 		}
 
-		public Builder firstName(String firstName) {
+		public Builder withFirstName(String firstName) {
 			this.firstName = firstName;
 			return this;
 		}
 
-		public Builder lastName(String lastName) {
+		public Builder withLastName(String lastName) {
 			this.lastName = lastName;
 			return this;
 		}
 
-		public Builder gender(Gender gender) {
+		public Builder withGender(Gender gender) {
 			this.gender = gender;
 			return this;
 		}
 
-		public Builder birthDate(LocalDate birthDate) {
+		public Builder withBirthDate(LocalDate birthDate) {
 			this.birthDate = birthDate;
 			return this;
 		}
 
-		public Builder maritalStatus(MaritalStatus maritalStatus) {
+		public Builder withMaritalStatus(MaritalStatus maritalStatus) {
 			this.maritalStatus = maritalStatus;
 			return this;
 		}
 
-		public Builder address(Address address) {
+		public Builder withAddress(Address address) {
 			this.address = address;
 			return this;
 		}
@@ -209,12 +209,12 @@ public final class Client extends AbstractEntity {
 		 * @param number
 		 *            The phone number
 		 */
-		public Builder phone(PhoneType phonetype, String number) {
+		public Builder withPhone(PhoneType phonetype, String number) {
 			this.phones.put(phonetype, number);
 			return this;
 		}
 
-		public Builder email(String email) {
+		public Builder withEmail(String email) {
 			this.email = email;
 			return this;
 		}

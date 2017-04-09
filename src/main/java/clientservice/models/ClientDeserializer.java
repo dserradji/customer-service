@@ -38,14 +38,14 @@ public class ClientDeserializer extends StdDeserializer<Client> {
 				.map(node -> ClientType.valueOf(node.asText())).orElse(null);
 		final Client.Builder builder = Client.ofType(clientType);
 
-		Optional.ofNullable(tree.findValue("id")).ifPresent(node -> builder.id(new ObjectId(node.asText())));
-		Optional.ofNullable(tree.findValue("first_name")).ifPresent(node -> builder.firstName(node.asText()));
-		Optional.ofNullable(tree.findValue("last_name")).ifPresent(node -> builder.lastName(node.asText()));
-		Optional.ofNullable(tree.findValue("gender")).ifPresent(node -> builder.gender(Gender.valueOf(node.asText())));
+		Optional.ofNullable(tree.findValue("id")).ifPresent(node -> builder.withId(new ObjectId(node.asText())));
+		Optional.ofNullable(tree.findValue("first_name")).ifPresent(node -> builder.withFirstName(node.asText()));
+		Optional.ofNullable(tree.findValue("last_name")).ifPresent(node -> builder.withLastName(node.asText()));
+		Optional.ofNullable(tree.findValue("gender")).ifPresent(node -> builder.withGender(Gender.valueOf(node.asText())));
 		Optional.ofNullable(tree.findValue("birth_date"))
-				.ifPresent(node -> builder.birthDate(LocalDate.parse(node.asText())));
+				.ifPresent(node -> builder.withBirthDate(LocalDate.parse(node.asText())));
 		Optional.ofNullable(tree.findValue("marital_status"))
-				.ifPresent(node -> builder.maritalStatus(MaritalStatus.valueOf(node.asText())));
+				.ifPresent(node -> builder.withMaritalStatus(MaritalStatus.valueOf(node.asText())));
 		Optional.ofNullable(tree.findValue("address")).ifPresent(node -> {
 
 			final String country = Optional.ofNullable(node.findValue("country"))
@@ -63,17 +63,17 @@ public class ClientDeserializer extends StdDeserializer<Client> {
 			Optional.ofNullable(node.findValue("state_or_province"))
 					.ifPresent(addressNode -> addressBuilder.stateOrProvince(addressNode.asText()));
 
-			builder.address(addressBuilder.build());
+			builder.withAddress(addressBuilder.build());
 		});
 
 		Optional.ofNullable(tree.findValue("phones")).map(node -> node.fields()).map(entries -> {
 			entries.forEachRemaining(entry -> {
-				builder.phone(PhoneType.valueOf(entry.getKey()), entry.getValue().asText());
+				builder.withPhone(PhoneType.valueOf(entry.getKey()), entry.getValue().asText());
 			});
 			return Optional.empty();
 		});
 
-		Optional.ofNullable(tree.findValue("email")).ifPresent(node -> builder.email(node.asText()));
+		Optional.ofNullable(tree.findValue("email")).ifPresent(node -> builder.withEmail(node.asText()));
 
 		return builder.build();
 	}

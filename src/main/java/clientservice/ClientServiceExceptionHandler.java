@@ -17,7 +17,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 public class ClientServiceExceptionHandler extends ResponseEntityExceptionHandler {
 
 	@ExceptionHandler(ClientServiceException.class)
-	ResponseEntity<?> handleControllerException(ClientServiceException ex) {
+	public ResponseEntity<?> handleControllerException(ClientServiceException ex) {
 		return new ResponseEntity<>(ex.getMessage(), ex.getHttpStatus());
 	}
 

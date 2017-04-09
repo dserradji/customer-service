@@ -9,6 +9,11 @@ import org.springframework.security.oauth2.provider.expression.OAuth2MethodSecur
 @Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class OAuth2GlobalMethodSecurityConfiguration extends GlobalMethodSecurityConfiguration {
+
+	/**
+	 * Customize the MethodSecurityExpressionHandler to be able to use the SPEL
+	 * variable 'oauth2' with security annotations like @PreAuthorize
+	 */
 	@Override
 	protected MethodSecurityExpressionHandler createExpressionHandler() {
 		return new OAuth2MethodSecurityExpressionHandler();

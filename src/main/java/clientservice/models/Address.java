@@ -28,7 +28,7 @@ public final class Address {
 	private String country;
 
 	private Address() {
-		// Needed by Spring Data
+		// Needed for Spring Data and Jackson serialization
 	}
 
 	private Address(int streetNumber, String streetName, String city, String zipcode, String stateOrProvince,

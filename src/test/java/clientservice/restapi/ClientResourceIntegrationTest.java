@@ -89,7 +89,7 @@ public class ClientResourceIntegrationTest {
 	public void shouldReturnOneClientById() throws Exception {
 
 		final LocalDate birthDate = LocalDate.of(1990, Month.JULY, 31);
-		final Client client = Client.ofType(PERSON).birthDate(birthDate).build();
+		final Client client = Client.ofType(PERSON).withBirthDate(birthDate).build();
 		final ObjectId id = ObjectId.get();
 
 		given(repo.findOne(any(ObjectId.class))).willReturn(Optional.of(client));
