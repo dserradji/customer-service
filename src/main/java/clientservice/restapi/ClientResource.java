@@ -39,12 +39,11 @@ public class ClientResource {
 	}
 
 	/**
-	 * Query for the list of all clients.
+	 * Query for all clients.
 	 * <p>
 	 * This method is idempotent.
 	 * 
-	 * @return HTTP 200 and the body containing all clients or HTTP 204 with
-	 *         empty body.
+	 * @return HTTP 200 if clients found or HTTP 204 otherwise.
 	 */
 	@PreAuthorize("#oauth2.hasAnyScope('read','write','read-write')")
 	@RequestMapping(method = GET)
@@ -62,8 +61,7 @@ public class ClientResource {
 	 * @param id
 	 *            The id of the client.
 	 * 
-	 * @return HTTP 200 and the body containing the client or 404 if the client
-	 *         is not found
+	 * @return HTTP 200 if the client is found or HTTP 404 otherwise.
 	 */
 	@PreAuthorize("#oauth2.hasAnyScope('read','write','read-write')")
 	@RequestMapping(method = GET, value = "/{id}")
@@ -75,9 +73,11 @@ public class ClientResource {
 	/**
 	 * Create a new client.
 	 * 
-	 * @param newClient The client to create.
+	 * @param newClient
+	 *            The client to create.
 	 * 
-	 * @return HTTP 201 with empty body and the header Location containing the URL of the created client.
+	 * @return HTTP 201, the header Location contains the URL of the created
+	 *         client.
 	 */
 	@PreAuthorize("#oauth2.hasAnyScope('write','read-write')")
 	@RequestMapping(method = POST, consumes = { APPLICATION_JSON_UTF8_VALUE })
@@ -104,7 +104,7 @@ public class ClientResource {
 	 *            The Client object containing the updated version to be
 	 *            persisted.
 	 * 
-	 * @return 204 with empty body or 400 if the client does not exist. 
+	 * @return HTTP 204 otherwise HTTP 400 if the client does not exist.
 	 */
 	@PreAuthorize("#oauth2.hasAnyScope('write','read-write')")
 	@RequestMapping(method = PUT, value = "/{id}", consumes = { APPLICATION_JSON_UTF8_VALUE })
@@ -128,7 +128,7 @@ public class ClientResource {
 	 * 
 	 * @param id
 	 *            The id of the client to delete.
-	 * @return 204 with empty body.
+	 * @return HTTP 204
 	 */
 	@PreAuthorize("#oauth2.hasAnyScope('write','read-write')")
 	@RequestMapping(method = DELETE, value = "/{id}")

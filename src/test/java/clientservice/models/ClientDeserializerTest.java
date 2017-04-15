@@ -201,4 +201,31 @@ public class ClientDeserializerTest {
 		assertThatThrownBy(() -> mapper.readValue(json, Client.class)).isInstanceOf(ClientServiceException.class)
 				.hasMessageContaining("Country can not be null");
 	}
+
+	@Test
+	public void shouldIgnoreUnknownFieldsAndMapClientType()
+			throws JsonParseException, JsonMappingException, IOException {
+
+		// Given
+		final String json = "{\"unknown1\":\"aaaaaa\",\"unknown2\":\"bbbbbb\",\"unknown3\":\"cccccc\",\"client_type\":\"PERSON\"}";
+
+		// When
+		final Client client = mapper.readValue(json, Client.class);
+
+		// Then
+		assertThat(client).isNotNull();
+		assertThat(client.getClientType()).isEqualTo(ClientType.PERSON);
+	}
+
+	@Test
+	public void shouldIgnoreUnknownFieldsAndFailBecauseNoClientTypeIsProvided()
+			throws JsonParseException, JsonMappingException, IOException {
+
+		// Given
+		final String json = "{\"unknown1\":\"aaaaaa\",\"unknown2\":\"bbbbbb\",\"unknown3\":\"cccccc\",\"first_name\":\"John\"}";
+
+		// When
+		assertThatThrownBy(() -> mapper.readValue(json, Client.class)).isInstanceOf(ClientServiceException.class)
+				.hasMessageContaining("Client type can not be null.");
+	}
 }

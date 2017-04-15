@@ -51,10 +51,10 @@ import clientservice.models.Client;
 /**
  * Top to bottom integration test.
  * <p>
- * The specified server will be started and the service will be available with a
- * random port number.
+ * For this test the application server (specified in pom.xml) will be started
+ * and the service deployed.
  * <p>
- * This class tests all CRUD operation in one big test.
+ * This class tests all CRUD operations in one big method.
  * 
  * @author Djallal Serradji
  *

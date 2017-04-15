@@ -21,8 +21,8 @@ public class ClientTest {
 
 		// Given
 		final Client client;
-		final Address address = Address.ofCountry("Shadaloo").streetNumber(110).streetName("Bison street")
-				.city("Shadaloo City").zipcode("123456").build();
+		final Address address = Address.ofCountry("Shadaloo").withStreetNumber(110).withStreetName("Bison street")
+				.withCity("Shadaloo City").withZipcode("123456").build();
 
 		// When
 		client = Client.ofType(ClientType.PERSON).withFirstName("Ken").withLastName("Masters").withGender(Gender.MALE)
@@ -53,8 +53,8 @@ public class ClientTest {
 
 		// Given
 		final Client client;
-		final Address address = Address.ofCountry("Shadaloo").streetNumber(110).streetName("Bison street")
-				.city("Shadaloo City").zipcode("123456").build();
+		final Address address = Address.ofCountry("Shadaloo").withStreetNumber(110).withStreetName("Bison street")
+				.withCity("Shadaloo City").withZipcode("123456").build();
 
 		// When
 		client = Client.ofType(ClientType.COMPANY).withLastName("Acme Corp.").withAddress(address)
@@ -79,11 +79,11 @@ public class ClientTest {
 	}
 
 	@Test
-	public void shouldUpdateTheClient() {
+	public void shouldUpdateAClient() {
 
 		// Given
-		final Address address = Address.ofCountry("Shadaloo").streetNumber(110).streetName("Bison street")
-				.city("Shadaloo City").zipcode("123456").build();
+		final Address address = Address.ofCountry("Shadaloo").withStreetNumber(110).withStreetName("Bison street")
+				.withCity("Shadaloo City").withZipcode("123456").build();
 
 		Client client = Client.ofType(ClientType.COMPANY).withLastName("Acme Corp.").withAddress(address)
 				.withPhone(PhoneType.HOME, "111111111").withPhone(PhoneType.CELLULAR, "222222222")

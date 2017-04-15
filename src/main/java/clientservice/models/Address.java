@@ -71,27 +71,27 @@ public final class Address {
 			this.country = country;
 		}
 
-		public Builder streetNumber(int streetNumber) {
+		public Builder withStreetNumber(int streetNumber) {
 			this.streetNumber = streetNumber;
 			return this;
 		}
 
-		public Builder streetName(String streetName) {
+		public Builder withStreetName(String streetName) {
 			this.streetName = streetName;
 			return this;
 		}
 
-		public Builder city(String city) {
+		public Builder withCity(String city) {
 			this.city = city;
 			return this;
 		}
 
-		public Builder zipcode(String zipcode) {
+		public Builder withZipcode(String zipcode) {
 			this.zipcode = zipcode;
 			return this;
 		}
 
-		public Builder stateOrProvince(String stateOrProvince) {
+		public Builder withStateOrProvince(String stateOrProvince) {
 			this.stateOrProvince = stateOrProvince;
 			return this;
 		}

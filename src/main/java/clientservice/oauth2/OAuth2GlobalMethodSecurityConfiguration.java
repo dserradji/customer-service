@@ -11,8 +11,8 @@ import org.springframework.security.oauth2.provider.expression.OAuth2MethodSecur
 public class OAuth2GlobalMethodSecurityConfiguration extends GlobalMethodSecurityConfiguration {
 
 	/**
-	 * Customize the MethodSecurityExpressionHandler in order to be able to use
-	 * the SPEL variable 'oauth2' with security annotations like @PreAuthorize
+	 * Customize the MethodSecurityExpressionHandler so we can use the SPEL
+	 * variable 'oauth2' with security annotations like @PreAuthorize
 	 */
 	@Override
 	protected MethodSecurityExpressionHandler createExpressionHandler() {

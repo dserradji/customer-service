@@ -22,7 +22,7 @@ public class ClientServiceExceptionHandler extends ResponseEntityExceptionHandle
 	}
 
 	@ExceptionHandler({ AccessDeniedException.class })
-	public ResponseEntity<Object> handleAccessDeniedException(Exception ex, WebRequest request) {
+	public ResponseEntity<?> handleAccessDeniedException(Exception ex, WebRequest request) {
 		return new ResponseEntity<>(ex.getMessage(), new HttpHeaders(), HttpStatus.FORBIDDEN);
 	}
 

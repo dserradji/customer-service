@@ -24,8 +24,8 @@ public class ClientRepositoryTest {
 
 	/**
 	 * Class level @DirtiesContext(classMode=ClassMode.BEFORE_EACH_TEST_METHOD)
-	 * can be used instead of this method to reset the context for each test but
-	 * execution will be much slower.
+	 * annotation can be used instead of this method to reset the context for
+	 * each test but execution will be much slower.
 	 */
 	@Before
 	public void cleanDB() {
@@ -33,11 +33,11 @@ public class ClientRepositoryTest {
 	}
 
 	@Test
-	public void shouldCreateAPersonWithId() {
+	public void shouldCreateAPerson() {
 
 		// Given
-		final Address address = Address.ofCountry("Shadaloo").streetNumber(110).streetName("Bison street")
-				.city("Shadaloo City").zipcode("123456").build();
+		final Address address = Address.ofCountry("Shadaloo").withStreetNumber(110).withStreetName("Bison street")
+				.withCity("Shadaloo City").withZipcode("123456").build();
 
 		// When
 		final Client saved = repo
@@ -50,11 +50,11 @@ public class ClientRepositoryTest {
 	}
 
 	@Test
-	public void shouldReadAPersonWithId() {
+	public void shouldFindAPersonWithItsId() {
 
 		// Given
-		final Address address = Address.ofCountry("Shadaloo").streetNumber(110).streetName("Bison street")
-				.city("Shadaloo City").zipcode("123456").build();
+		final Address address = Address.ofCountry("Shadaloo").withStreetNumber(110).withStreetName("Bison street")
+				.withCity("Shadaloo City").withZipcode("123456").build();
 		final Client saved = repo
 				.save(Client.ofType(PERSON).withFirstName("Ken").withLastName("Masters").withAddress(address).build());
 
@@ -72,12 +72,12 @@ public class ClientRepositoryTest {
 	public void shouldUpdateAPerson() {
 
 		// Given
-		Address address = Address.ofCountry("Shadaloo").streetNumber(110).streetName("Bison street")
-				.city("Shadaloo City").zipcode("123456").build();
+		Address address = Address.ofCountry("Shadaloo").withStreetNumber(110).withStreetName("Bison street")
+				.withCity("Shadaloo City").withZipcode("123456").build();
 		final Client saved = repo
 				.save(Client.ofType(PERSON).withFirstName("Ken").withLastName("Masters").withAddress(address).build());
 		Client retrieved = repo.findOne(saved.getId()).get();
-		address = Address.from(address).zipcode("654321").build();
+		address = Address.from(address).withZipcode("654321").build();
 		retrieved = Client.from(retrieved).withEmail("kenm@email.com").withAddress(address).build();
 
 		// When
@@ -107,8 +107,8 @@ public class ClientRepositoryTest {
 	public void shouldReturnAllClients() {
 
 		// Given
-		final Address address = Address.ofCountry("Shadaloo").streetNumber(110).streetName("Bison street")
-				.city("Shadaloo City").zipcode("123456").build();
+		final Address address = Address.ofCountry("Shadaloo").withStreetNumber(110).withStreetName("Bison street")
+				.withCity("Shadaloo City").withZipcode("123456").build();
 		repo.save(Client.ofType(PERSON).withFirstName("Ken").withLastName("Masters").withAddress(address).build());
 		repo.save(Client.ofType(COMPANY).withFirstName("Ken").withLastName("Masters").withAddress(address).build());
 

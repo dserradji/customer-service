@@ -85,7 +85,7 @@ public class ClientResourceTest {
 	}
 
 	@Test
-	public void shouldReturn404IfClientNotFound() {
+	public void shouldReturn404IfClientIsNotFound() {
 
 		// Given
 		when(repo.findOne(any(ObjectId.class))).thenReturn(Optional.empty());
@@ -118,7 +118,7 @@ public class ClientResourceTest {
 	}
 
 	@Test
-	public void shouldNotAddClientIfClientAlreadyExists() throws Exception {
+	public void shouldNotAddAClientIfClientAlreadyExists() throws Exception {
 
 		// Given
 		when(repo.exists(any(ObjectId.class))).thenReturn(true);

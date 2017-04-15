@@ -29,8 +29,9 @@ import clientservice.models.enums.PhoneType;
  * {@code Client updatedClient = Client.from(client).firstName("Bison").build();}
  */
 @JsonDeserialize(using = ClientDeserializer.class)
-public final class Client extends AbstractEntity {
+public final class Client {
 
+	private ObjectId id;
 	private String firstName;
 	private String lastName;
 	private Gender gender;
@@ -42,8 +43,6 @@ public final class Client extends AbstractEntity {
 	private ClientType clientType;
 
 	private Client() {
-		// Needed for Spring Data and Jackson serialization
-//		phones = new HashMap<>();
 	}
 
 	private Client(ObjectId id, String firstName, String lastName, Gender gender, LocalDate birthDate,
@@ -59,6 +58,10 @@ public final class Client extends AbstractEntity {
 		this.phones = phones;
 		this.email = email;
 		this.clientType = clientType;
+	}
+
+	public ObjectId getId() {
+		return id;
 	}
 
 	public String getFirstName() {

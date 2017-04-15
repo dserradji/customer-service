@@ -15,8 +15,8 @@ public class AddressTest {
 		final Address address;
 
 		// When
-		address = Address.ofCountry("Shadaloo").streetNumber(110).streetName("Bison street").city("Shadaloo City")
-				.zipcode("123456").build();
+		address = Address.ofCountry("Shadaloo").withStreetNumber(110).withStreetName("Bison street").withCity("Shadaloo City")
+				.withZipcode("123456").build();
 
 		// Then
 		assertThat(address).isNotNull();
@@ -29,14 +29,14 @@ public class AddressTest {
 	}
 
 	@Test
-	public void shouldUpdateImmutableAddress() {
+	public void shouldUpdateAnAddress() {
 
 		// Given
-		Address address = Address.ofCountry("Shadaloo").streetNumber(110).streetName("Bison street")
-				.city("Shadaloo City").zipcode("123456").build();
+		Address address = Address.ofCountry("Shadaloo").withStreetNumber(110).withStreetName("Bison street")
+				.withCity("Shadaloo City").withZipcode("123456").build();
 
 		// When
-		address = Address.from(address).streetNumber(2000).build();
+		address = Address.from(address).withStreetNumber(2000).build();
 
 		// Then
 		assertThat(address).isNotNull();
