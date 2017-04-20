@@ -7,7 +7,16 @@ import java.util.Map;
 import org.bson.types.ObjectId;
 import org.springframework.http.HttpStatus;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonFormat.Shape;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 
 import clientservice.ClientServiceException;
 import clientservice.models.enums.ClientType;
@@ -29,12 +38,17 @@ import clientservice.models.enums.PhoneType;
  * {@code Client updatedClient = Client.from(client).firstName("Bison").build();}
  */
 @JsonDeserialize(using = ClientDeserializer.class)
+@JsonIgnoreProperties(ignoreUnknown=true)
+@JsonInclude(Include.NON_NULL)
+@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 public final class Client {
 
+	@JsonSerialize(using=ToStringSerializer.class)
 	private ObjectId id;
 	private String firstName;
 	private String lastName;
 	private Gender gender;
+	@JsonFormat(shape=Shape.STRING)
 	private LocalDate birthDate;
 	private MaritalStatus maritalStatus;
 	private Address address;

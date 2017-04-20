@@ -1,6 +1,7 @@
 package clientservice.restapi;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
+import static java.lang.String.format;
+import static org.springframework.http.MediaType.*;
 import static org.springframework.http.ResponseEntity.created;
 import static org.springframework.http.ResponseEntity.noContent;
 import static org.springframework.http.ResponseEntity.notFound;
@@ -11,6 +12,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 
 import java.net.URI;
+import java.util.List;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -27,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 import clientservice.ClientServiceException;
 import clientservice.models.Client;
 import clientservice.repositories.mongodb.ClientRepository;
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping(path = "/clients", produces = { APPLICATION_JSON_UTF8_VALUE })
@@ -47,10 +50,15 @@ public class ClientResource {
 	 */
 	@PreAuthorize("#oauth2.hasAnyScope('read','write','read-write')")
 	@RequestMapping(method = GET)
-	public ResponseEntity<?> allClients() {
+	public Mono<ResponseEntity<List<Client>>> allClients() {
 
-		final Iterable<Client> it = repo.findAll();
-		return it.iterator().hasNext() ? ok(it) : noContent().build();
+		return repo.findAll().collectList().flatMap(clients -> {
+			if (clients.size() > 0) {
+				return Mono.just(ok(clients));
+			} else {
+				return Mono.just(noContent().build());
+			}
+		});
 	}
 
 	/**
@@ -65,9 +73,12 @@ public class ClientResource {
 	 */
 	@PreAuthorize("#oauth2.hasAnyScope('read','write','read-write')")
 	@RequestMapping(method = GET, value = "/{id}")
-	public ResponseEntity<?> oneClient(@PathVariable @NotNull ObjectId id) {
+	public Mono<ResponseEntity<Client>> oneClient(@PathVariable @NotNull ObjectId id) {
 
-		return repo.findOne(id).map(client -> ok(client)).orElse(notFound().build());
+		return repo
+				.findOne(id)
+				.flatMap(client -> Mono.just(ok().contentType(APPLICATION_JSON_UTF8).body(client)))
+				.switchIfEmpty(Mono.just(notFound().build()));
 	}
 
 	/**
@@ -81,15 +92,23 @@ public class ClientResource {
 	 */
 	@PreAuthorize("#oauth2.hasAnyScope('write','read-write')")
 	@RequestMapping(method = POST, consumes = { APPLICATION_JSON_UTF8_VALUE })
-	public ResponseEntity<?> addClient(@RequestBody @Valid Client newClient) {
+	public Mono<ResponseEntity<?>> addClient(@RequestBody @Valid Mono<Client> newClient) {
 
-		if (newClient.getId() != null && repo.exists(newClient.getId())) {
-			throw new ClientServiceException(HttpStatus.BAD_REQUEST,
-					"Client already exists, to update an existing client use PUT instead.");
-		}
+		return newClient.flatMap(client -> {
 
-		final Client created = repo.save(newClient);
-		return created(URI.create(String.format("/clients/%s", created.getId()))).build();
+			return Mono.justOrEmpty(client.getId()).flatMap(id -> repo.exists(id)).defaultIfEmpty(Boolean.FALSE)
+					.flatMap(exists -> {
+
+						if (exists) {
+							throw new ClientServiceException(HttpStatus.BAD_REQUEST,
+									"Client already exists, to update an existing client use PUT instead.");
+						}
+
+						return repo.save(client).flatMap(created -> {
+							return Mono.just(created(URI.create(format("/clients/%s", created.getId()))).build());
+						});
+					});
+		});
 	}
 
 	/**
@@ -108,15 +127,18 @@ public class ClientResource {
 	 */
 	@PreAuthorize("#oauth2.hasAnyScope('write','read-write')")
 	@RequestMapping(method = PUT, value = "/{id}", consumes = { APPLICATION_JSON_UTF8_VALUE })
-	public ResponseEntity<?> updateClient(@PathVariable @NotNull ObjectId id, @RequestBody @Valid Client update) {
+	public Mono<ResponseEntity<?>> updateClient(@PathVariable @NotNull ObjectId id,
+			@RequestBody @Valid Mono<Client> updatedClient) {
+		
+		return repo.exists(id).flatMap(exists -> {
 
-		if (!repo.exists(id)) {
-			throw new ClientServiceException(HttpStatus.BAD_REQUEST,
-					"Client does not exist, to create a new client use POST instead.");
-		}
+			if (!exists) {
+				throw new ClientServiceException(HttpStatus.BAD_REQUEST,
+						"Client does not exist, to create a new client use POST instead.");
+			}
 
-		repo.save(update);
-		return noContent().build();
+			return updatedClient.flatMap(client -> repo.save(client)).then(Mono.just(noContent().build()));
+		});
 	}
 
 	/**
@@ -132,12 +154,11 @@ public class ClientResource {
 	 */
 	@PreAuthorize("#oauth2.hasAnyScope('write','read-write')")
 	@RequestMapping(method = DELETE, value = "/{id}")
-	public ResponseEntity<?> deleteClient(@PathVariable @NotNull ObjectId id) {
+	public Mono<ResponseEntity<?>> deleteClient(@PathVariable @NotNull ObjectId id) {
 
-		if (repo.exists(id)) {
-			repo.delete(id);
-		}
+		final Mono<ResponseEntity<?>> noContent = Mono.just(noContent().build());
 
-		return noContent().build();
+		return repo.exists(id).filter(Boolean::valueOf).flatMap(exists -> repo.delete(id).then(noContent))
+				.switchIfEmpty(noContent);
 	}
 }

@@ -29,7 +29,7 @@ public class ClientRepositoryTest {
 	 */
 	@Before
 	public void cleanDB() {
-		repo.deleteAll();
+		repo.deleteAll().block();
 	}
 
 	@Test
@@ -41,7 +41,8 @@ public class ClientRepositoryTest {
 
 		// When
 		final Client saved = repo
-				.save(Client.ofType(PERSON).withFirstName("Ken").withLastName("Masters").withAddress(address).build());
+				.save(Client.ofType(PERSON).withFirstName("Ken").withLastName("Masters").withAddress(address).build())
+				.block();
 
 		// Then
 		assertThat(saved.getId()).isNotNull();
@@ -56,10 +57,11 @@ public class ClientRepositoryTest {
 		final Address address = Address.ofCountry("Shadaloo").withStreetNumber(110).withStreetName("Bison street")
 				.withCity("Shadaloo City").withZipcode("123456").build();
 		final Client saved = repo
-				.save(Client.ofType(PERSON).withFirstName("Ken").withLastName("Masters").withAddress(address).build());
+				.save(Client.ofType(PERSON).withFirstName("Ken").withLastName("Masters").withAddress(address).build())
+				.block();
 
 		// When
-		final Client retrieved = repo.findOne(saved.getId()).get();
+		final Client retrieved = repo.findOne(saved.getId()).block();
 
 		// Then
 		assertThat(retrieved).isNotNull();
@@ -75,13 +77,14 @@ public class ClientRepositoryTest {
 		Address address = Address.ofCountry("Shadaloo").withStreetNumber(110).withStreetName("Bison street")
 				.withCity("Shadaloo City").withZipcode("123456").build();
 		final Client saved = repo
-				.save(Client.ofType(PERSON).withFirstName("Ken").withLastName("Masters").withAddress(address).build());
-		Client retrieved = repo.findOne(saved.getId()).get();
+				.save(Client.ofType(PERSON).withFirstName("Ken").withLastName("Masters").withAddress(address).build())
+				.block();
+		Client retrieved = repo.findOne(saved.getId()).block();
 		address = Address.from(address).withZipcode("654321").build();
 		retrieved = Client.from(retrieved).withEmail("kenm@email.com").withAddress(address).build();
 
 		// When
-		final Client updated = repo.save(retrieved);
+		final Client updated = repo.save(retrieved).block();
 
 		// Then
 		assertThat(updated.getId()).isEqualTo(retrieved.getId());
@@ -93,11 +96,12 @@ public class ClientRepositoryTest {
 	public void shouldDeleteAPerson() {
 
 		// Given
-		final Client saved = repo.save(Client.ofType(PERSON).withFirstName("Ken").withLastName("Masters").build());
+		final Client saved = repo.save(Client.ofType(PERSON).withFirstName("Ken").withLastName("Masters").build())
+				.block();
 
 		// When
-		repo.delete(saved);
-		boolean exists = repo.exists(saved.getId());
+		repo.delete(saved).block();
+		boolean exists = repo.exists(saved.getId()).block();
 
 		// Then
 		assertThat(exists).isFalse();
@@ -109,11 +113,13 @@ public class ClientRepositoryTest {
 		// Given
 		final Address address = Address.ofCountry("Shadaloo").withStreetNumber(110).withStreetName("Bison street")
 				.withCity("Shadaloo City").withZipcode("123456").build();
-		repo.save(Client.ofType(PERSON).withFirstName("Ken").withLastName("Masters").withAddress(address).build());
-		repo.save(Client.ofType(COMPANY).withFirstName("Ken").withLastName("Masters").withAddress(address).build());
+		repo.save(Client.ofType(PERSON).withFirstName("Ken").withLastName("Masters").withAddress(address).build())
+				.block();
+		repo.save(Client.ofType(COMPANY).withFirstName("Ken").withLastName("Masters").withAddress(address).build())
+				.block();
 
 		// When
-		final Iterable<Client> clients = repo.findAll();
+		final Iterable<Client> clients = repo.findAll().toIterable();
 
 		// Then
 		assertThat(clients).isNotNull();
@@ -126,7 +132,7 @@ public class ClientRepositoryTest {
 		// Given
 
 		// When
-		final Iterable<Client> clients = repo.findAll();
+		final Iterable<Client> clients = repo.findAll().toIterable();
 
 		// Then
 		assertThat(clients).isNotNull();

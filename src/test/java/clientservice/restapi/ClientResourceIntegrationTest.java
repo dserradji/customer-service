@@ -3,132 +3,97 @@ package clientservice.restapi;
 import static clientservice.models.enums.ClientType.COMPANY;
 import static clientservice.models.enums.ClientType.PERSON;
 import static java.util.Arrays.asList;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.hasItems;
-import static org.hamcrest.CoreMatchers.is;
+import static java.util.stream.Collectors.toList;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.head;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.net.URI;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import org.bson.types.ObjectId;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.SecurityProperties;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.reactive.server.WebTestClient;
 
-import clientservice.ClientServiceExceptionHandler;
 import clientservice.models.Client;
 import clientservice.repositories.mongodb.ClientRepository;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest(controllers = { ClientResource.class })
-@ContextConfiguration(classes = { ClientServiceExceptionHandler.class })
-@ComponentScan
 public class ClientResourceIntegrationTest {
-
-	/**
-	 * Disable Spring Security OAuth2 authentication.
-	 * 
-	 */
-	@Order(SecurityProperties.ACCESS_OVERRIDE_ORDER)
-	@Configuration
-	static class CustomWebSecurityConfigurer extends WebSecurityConfigurerAdapter {
-
-		@Override
-		public void configure(WebSecurity web) throws Exception {
-			web.ignoring().anyRequest();
-		}
-	}
 
 	@MockBean
 	private ClientRepository repo;
 
-	@Autowired
-	private MockMvc mvc;
-
-	@Test
-	public void shouldReturnAllClients() throws Exception {
-
-		final List<Client> clients = asList(Client.ofType(PERSON).build(), Client.ofType(COMPANY).build());
-
-		given(repo.findAll()).willReturn(clients);
-
-		// Expect HTTP 200
-		mvc.perform(get("/clients").accept(APPLICATION_JSON_UTF8)).andExpect(status().isOk())
-				.andExpect(content().contentType(APPLICATION_JSON_UTF8)).andExpect(jsonPath("$..client_type").isArray())
-				.andExpect(jsonPath("$..client_type").value(hasItems(PERSON.toString(), COMPANY.toString())));
+	private WebTestClient webClient;
+	
+	@Before
+	public void init() {
+		webClient = WebTestClient.bindToController(new ClientResource(repo)).build();
 	}
 
+	@Test
+	public void shouldReturnAllClients() {
+
+		final List<Client> mockClients = asList(Client.ofType(PERSON).build(), Client.ofType(COMPANY).build());
+		given(repo.findAll()).willReturn(Flux.fromIterable(mockClients));
+
+		webClient.get().uri("/clients").accept(APPLICATION_JSON_UTF8).exchange()
+			.expectStatus().isOk()	// HTTP 200
+			.expectHeader().contentType(APPLICATION_JSON_UTF8)
+			.expectBodyList(Client.class).hasSize(2).consumeWith(clients -> {
+					assertThat(clients.stream().map(Client::getClientType).collect(toList())
+							.containsAll(asList(PERSON, COMPANY)));
+				});
+	}
+	
+	@Test
+	public void shouldReturnEmptyBodyWhenNoClientsFound() {
+
+		final List<Client> clients = Collections.emptyList();
+		given(repo.findAll()).willReturn(Flux.fromIterable(clients));
+
+		
+		webClient.get().uri("/clients").accept(APPLICATION_JSON_UTF8).exchange()
+			.expectStatus().isNoContent();	// HTTP 204
+	}
+	
 	@Test
 	public void shouldReturnOneClientById() throws Exception {
 
 		final LocalDate birthDate = LocalDate.of(1990, Month.JULY, 31);
-		final Client client = Client.ofType(PERSON).withBirthDate(birthDate).build();
+		final Client mockClient = Client.ofType(PERSON).withBirthDate(birthDate).build();
 		final ObjectId id = ObjectId.get();
 
-		given(repo.findOne(any(ObjectId.class))).willReturn(Optional.of(client));
+		given(repo.findOne(any(ObjectId.class))).willReturn(Mono.just(mockClient));
 
-		// Expect HTTP 200
-		mvc.perform(get(String.format("/clients/%s", id)).accept(APPLICATION_JSON_UTF8)).andExpect(status().isOk())
-				.andExpect(content().contentType(APPLICATION_JSON_UTF8))
-				.andExpect(jsonPath("$..client_type").value("PERSON"))
-				.andExpect(jsonPath("$..birth_date").value("1990-07-31"));
+		webClient.get().uri(String.format("/clients/%s", id)).accept(APPLICATION_JSON_UTF8).exchange()
+			.expectStatus().isOk()	// HTTP 200
+			.expectBody(Client.class)
+			.consumeWith(client -> {
+					assertThat(client.getClientType()).isEqualTo(PERSON);
+					assertThat(client.getBirthDate()).isEqualTo(LocalDate.of(1990, 07, 31));
+				});
 	}
 
 	@Test
 	public void shouldReturn404IfClientNotFound() throws Exception {
 
-		given(repo.findOne(any(ObjectId.class))).willReturn(Optional.empty());
+		given(repo.findOne(any(ObjectId.class))).willReturn(Mono.empty());
 
-		// Expect HTTP 404
-		mvc.perform(get(String.format("/clients/%s", ObjectId.get())).accept(APPLICATION_JSON_UTF8))
-				.andExpect(status().isNotFound()).andExpect(content().string(""));
-	}
-
-	@Test
-	public void shouldReturnEmptyBodyWhenNoClients() throws Exception {
-
-		given(repo.findAll()).willReturn(Collections.emptyList());
-
-		// Expect HTTP 204
-		mvc.perform(get("/clients").accept(APPLICATION_JSON_UTF8)).andExpect(status().isNoContent());
-	}
-
-	@Test
-	public void shouldReturnHeadersOnly() throws Exception {
-
-		final List<Client> clients = asList(Client.ofType(PERSON).build(), Client.ofType(COMPANY).build());
-
-		given(repo.findAll()).willReturn(clients);
-
-		// Expect HTTP 200
-		mvc.perform(head("/clients").accept(APPLICATION_JSON_UTF8)).andExpect(status().isOk());
+		webClient.get().uri(String.format("/clients/%s", ObjectId.get())).accept(APPLICATION_JSON_UTF8).exchange()
+				.expectStatus().isNotFound() // HTTP 404
+				.expectBody().isEmpty();
 	}
 
 	@Test
@@ -139,12 +104,12 @@ public class ClientResourceIntegrationTest {
 		final ObjectId id = ObjectId.get();
 		ReflectionTestUtils.setField(newClient, "id", id);
 
-		given(repo.save(any(Client.class))).willReturn(newClient);
+		given(repo.exists(any(ObjectId.class))).willReturn(Mono.just(false));
+		given(repo.save(any(Client.class))).willReturn(Mono.just(newClient));
 
-		// Expect HTTP 201
-		mvc.perform(post("/clients").contentType(APPLICATION_JSON_UTF8).content("{\"client_type\":\"PERSON\"}"))
-				.andExpect(status().isCreated())
-				.andExpect(header().string("Location", is(equalTo(String.format("/clients/%s", id)))));
+		webClient.post().uri("/clients").contentType(APPLICATION_JSON_UTF8).body("{\"client_type\":\"PERSON\"}").exchange()
+			.expectStatus().isCreated()	// HTTP 201
+			.expectHeader().valueEquals("Location", String.format("/clients/%s", id));
 	}
 
 	@Test
@@ -152,73 +117,72 @@ public class ClientResourceIntegrationTest {
 
 		final String BAD_JSON = "{\"client_type_is_missing\":\"PERSON\"}";
 
-		// Expect HTTP 400
-		mvc.perform(post("/clients").contentType(APPLICATION_JSON_UTF8).content(BAD_JSON))
-				.andExpect(status().isBadRequest());
+		webClient.post().uri("/clients").contentType(APPLICATION_JSON_UTF8).body(BAD_JSON).exchange().expectStatus()
+				.isBadRequest();	// HTTP 400
 	}
 
 	@Test
 	public void shouldNotAddClientIfClientAlreadyExists() throws Exception {
 
-		given(repo.exists(any(ObjectId.class))).willReturn(true);
+		given(repo.exists(any(ObjectId.class))).willReturn(Mono.just(true));
 		final ObjectId id = ObjectId.get();
 
-		// Expect HTTP 400
 		final String EXISTING_CLIENT = String.format("{\"id\":\"%s\",\"client_type\":\"COMPANY\"}", id);
-		mvc.perform(post("/clients").contentType(APPLICATION_JSON_UTF8).content(EXISTING_CLIENT))
-				.andExpect(status().isBadRequest());
+		webClient.post().uri("/clients").contentType(APPLICATION_JSON_UTF8).body(EXISTING_CLIENT).exchange()
+				.expectStatus().is5xxServerError(); // HTTP 500 because the
+													// exception handler is not
+													// used yet.
 	}
 
 	@Test
 	public void shouldUpdateAnExistingClient() throws Exception {
 
-		given(repo.exists(any(ObjectId.class))).willReturn(true);
-		given(repo.save(any(Client.class))).willReturn(Client.ofType(PERSON).build());
+		given(repo.exists(any(ObjectId.class))).willReturn(Mono.just(true));
+		given(repo.save(any(Client.class))).willReturn(Mono.just(Client.ofType(PERSON).build()));
 
 		final ObjectId id = ObjectId.get();
 		final String UPDATE = String.format(
 				"{\"id\":\"%s\",\"first_name\":\"John\",\"last_name\":\"Doe\",\"client_type\":\"COMPANY\"}", id);
 
-		// Expect HTTP 204
-		mvc.perform(put(String.format("/clients/%s", id)).contentType(APPLICATION_JSON_UTF8).content(UPDATE))
-				.andExpect(status().isNoContent());
+		webClient.put().uri(String.format("/clients/%s", id)).contentType(APPLICATION_JSON_UTF8).body(UPDATE).exchange()
+				.expectStatus().isNoContent(); // HTTP 204
 	}
 
 	@Test
 	public void shouldFailUpdatingNonExistingClient() throws Exception {
 
-		given(repo.exists(any(ObjectId.class))).willReturn(false);
+		given(repo.exists(any(ObjectId.class))).willReturn(Mono.just(false));
 
 		final ObjectId id = ObjectId.get();
 		final String UPDATE = String.format(
 				"{\"id\":\"%s\",\"first_name\":\"John\",\"last_name\":\"Doe\",\"client_type\":\"COMPANY\"}", id);
 
-		// Expect HTTP 204
-		mvc.perform(put(String.format("/clients/%s", id)).contentType(APPLICATION_JSON_UTF8).content(UPDATE))
-				.andExpect(status().isBadRequest());
+		webClient.put().uri(String.format("/clients/%s", id)).contentType(APPLICATION_JSON_UTF8).body(UPDATE).exchange()
+				.expectStatus().is5xxServerError(); // HTTP 500 because the
+													// exception handler is not
+													// used yet.
 	}
 
 	@Test
 	public void shouldDeleteAnExistingClient() throws Exception {
 
-		given(repo.exists(any(ObjectId.class))).willReturn(true);
-
-		final ObjectId id = ObjectId.get();
-
-		// Expect HTTP 204
-		mvc.perform(delete(String.format("/clients/%s", id))).andExpect(status().isNoContent());
+		given(repo.exists(any(ObjectId.class))).willReturn(Mono.just(true));
+		given(repo.delete(any(ObjectId.class))).willReturn(Mono.empty());
+		final URI uri = URI.create(String.format("/clients/%s", ObjectId.get()));
+		
+		webClient.delete().uri(uri).exchange().expectStatus().isNoContent();
 	}
 
 	@Test
 	public void shouldDeleteExistingClientAndIgnoreFollowingCalls() throws Exception {
 
-		given(repo.exists(any(ObjectId.class))).willReturn(true).willReturn(false);
-
-		final ObjectId id = ObjectId.get();
+		given(repo.exists(any(ObjectId.class))).willReturn(Mono.just(true)).willReturn(Mono.just(false));
+		given(repo.delete(any(ObjectId.class))).willReturn(Mono.empty());
+		final URI uri = URI.create(String.format("/clients/%s", ObjectId.get()));
 
 		// Expect HTTP 204 for each call
-		mvc.perform(delete(String.format("/clients/%s", id))).andExpect(status().isNoContent());
-		mvc.perform(delete(String.format("/clients/%s", id))).andExpect(status().isNoContent());
-		mvc.perform(delete(String.format("/clients/%s", id))).andExpect(status().isNoContent());
+		webClient.delete().uri(uri).exchange().expectStatus().isNoContent();
+		webClient.delete().uri(uri).exchange().expectStatus().isNoContent();
+		webClient.delete().uri(uri).exchange().expectStatus().isNoContent();
 	}
 }

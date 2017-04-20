@@ -13,9 +13,7 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import org.bson.types.ObjectId;
 import org.junit.Test;
@@ -30,6 +28,8 @@ import clientservice.ClientServiceException;
 import clientservice.models.Client;
 import clientservice.models.enums.ClientType;
 import clientservice.repositories.mongodb.ClientRepository;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ClientResourceTest {
@@ -40,16 +40,15 @@ public class ClientResourceTest {
 	@InjectMocks
 	private ClientResource controller;
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void shouldReturnAllClients() {
 
 		// Given
 		final List<Client> clients = asList(Client.ofType(PERSON).build(), Client.ofType(COMPANY).build());
-		when(repo.findAll()).thenReturn(clients);
+		when(repo.findAll()).thenReturn(Flux.fromIterable(clients));
 
 		// When
-		final ResponseEntity<?> response = controller.allClients();
+		final ResponseEntity<List<Client>> response = controller.allClients().block();
 
 		// Then
 		assertThat(response.getStatusCode()).isEqualTo(OK);
@@ -60,10 +59,10 @@ public class ClientResourceTest {
 	public void shouldReturnEmptyBodyWhenNoClients() {
 
 		// Given
-		when(repo.findAll()).thenReturn(Collections.emptyList());
+		when(repo.findAll()).thenReturn(Flux.empty());
 
 		// When
-		final ResponseEntity<?> response = controller.allClients();
+		final ResponseEntity<List<Client>> response = controller.allClients().block();
 
 		// Then
 		assertThat(response.getStatusCode()).isEqualTo(NO_CONTENT);
@@ -74,10 +73,10 @@ public class ClientResourceTest {
 
 		// Given
 		final Client client = Client.ofType(PERSON).build();
-		when(repo.findOne(any(ObjectId.class))).thenReturn(Optional.of(client));
+		when(repo.findOne(any(ObjectId.class))).thenReturn(Mono.just(client));
 
 		// When
-		final ResponseEntity<?> response = controller.oneClient(ObjectId.get());
+		final ResponseEntity<Client> response = controller.oneClient(ObjectId.get()).block();
 
 		// Then
 		assertThat(response.getStatusCode()).isEqualTo(OK);
@@ -88,10 +87,10 @@ public class ClientResourceTest {
 	public void shouldReturn404IfClientIsNotFound() {
 
 		// Given
-		when(repo.findOne(any(ObjectId.class))).thenReturn(Optional.empty());
+		when(repo.findOne(any(ObjectId.class))).thenReturn(Mono.empty());
 
 		// When
-		final ResponseEntity<?> response = controller.oneClient(ObjectId.get());
+		final ResponseEntity<Client> response = controller.oneClient(ObjectId.get()).block();
 
 		// Then
 		assertThat(response.getStatusCode()).isEqualTo(NOT_FOUND);
@@ -107,10 +106,11 @@ public class ClientResourceTest {
 		final ObjectId id = ObjectId.get();
 		ReflectionTestUtils.setField(newClient, "id", id);
 
-		when(repo.save(any(Client.class))).thenReturn(newClient);
+		when(repo.exists(any(ObjectId.class))).thenReturn(Mono.just(false));
+		when(repo.save(any(Client.class))).thenReturn(Mono.just(newClient));
 
 		// When
-		final ResponseEntity<?> response = controller.addClient(newClient);
+		final ResponseEntity<?> response = controller.addClient(Mono.just(newClient)).block();
 
 		// Then
 		assertThat(response.getStatusCode()).isEqualTo(CREATED);
@@ -121,29 +121,29 @@ public class ClientResourceTest {
 	public void shouldNotAddAClientIfClientAlreadyExists() throws Exception {
 
 		// Given
-		when(repo.exists(any(ObjectId.class))).thenReturn(true);
+		when(repo.exists(any(ObjectId.class))).thenReturn(Mono.just(true));
 		final ObjectId id = ObjectId.get();
 		final Client client = Client.ofType(PERSON).build();
 		ReflectionTestUtils.setField(client, "id", id);
 
 		// When
 		// Then
-		assertThatThrownBy(() -> controller.addClient(client)).isInstanceOf(ClientServiceException.class)
-				.hasMessageContaining("Client already exists");
+		assertThatThrownBy(() -> controller.addClient(Mono.just(client)).block())
+				.isInstanceOf(ClientServiceException.class).hasMessageContaining("Client already exists");
 	}
 
 	@Test
 	public void shouldUpdateAnExistingClient() {
 
 		// Given
-		when(repo.exists(any(ObjectId.class))).thenReturn(true);
-		when(repo.save(any(Client.class))).thenReturn(Client.ofType(PERSON).build());
+		when(repo.exists(any(ObjectId.class))).thenReturn(Mono.just(true));
+		when(repo.save(any(Client.class))).thenReturn(Mono.just(Client.ofType(PERSON).build()));
 		final ObjectId id = ObjectId.get();
 		final Client existingClient = Client.ofType(ClientType.PERSON).build();
 		ReflectionTestUtils.setField(existingClient, "id", id);
 
 		// When
-		final ResponseEntity<?> response = controller.updateClient(existingClient.getId(), existingClient);
+		final ResponseEntity<?> response = controller.updateClient(id, Mono.just(existingClient)).block();
 
 		// Then
 		assertThat(response.getStatusCode()).isEqualTo(NO_CONTENT);
@@ -153,14 +153,14 @@ public class ClientResourceTest {
 	public void shouldFailUpdatingNonExistingClient() {
 
 		// Given
-		when(repo.exists(any(ObjectId.class))).thenReturn(false);
+		when(repo.exists(any(ObjectId.class))).thenReturn(Mono.just(false));
 		final ObjectId id = ObjectId.get();
 		final Client newClient = Client.ofType(ClientType.PERSON).build();
 		ReflectionTestUtils.setField(newClient, "id", id);
 
 		// When
 		// Then
-		assertThatThrownBy(() -> controller.updateClient(newClient.getId(), newClient))
+		assertThatThrownBy(() -> controller.updateClient(newClient.getId(), Mono.just(newClient)).block())
 				.isInstanceOf(ClientServiceException.class).hasMessageContaining("Client does not exist");
 	}
 
@@ -168,11 +168,12 @@ public class ClientResourceTest {
 	public void shouldDeleteAnExistingClient() {
 
 		// Given
-		when(repo.exists(any(ObjectId.class))).thenReturn(true);
+		when(repo.exists(any(ObjectId.class))).thenReturn(Mono.just(true));
+		when(repo.delete(any(ObjectId.class))).thenReturn(Mono.empty());
 		final ObjectId id = ObjectId.get();
 
 		// When
-		final ResponseEntity<?> response = controller.deleteClient(id);
+		final ResponseEntity<?> response = controller.deleteClient(id).block();
 
 		// Then
 		assertThat(response.getStatusCode()).isEqualTo(NO_CONTENT);
@@ -182,13 +183,14 @@ public class ClientResourceTest {
 	public void shouldDeleteExistingClientAndIgnoreSubsequentCalls() throws Exception {
 
 		// Given
-		when(repo.exists(any(ObjectId.class))).thenReturn(true).thenReturn(false);
+		when(repo.exists(any(ObjectId.class))).thenReturn(Mono.just(true)).thenReturn(Mono.just(false));
+		when(repo.delete(any(ObjectId.class))).thenReturn(Mono.empty());
 		final ObjectId id = ObjectId.get();
 
 		// When
-		final ResponseEntity<?> response1 = controller.deleteClient(id);
-		final ResponseEntity<?> response2 = controller.deleteClient(id);
-		final ResponseEntity<?> response3 = controller.deleteClient(id);
+		final ResponseEntity<?> response1 = controller.deleteClient(id).block();
+		final ResponseEntity<?> response2 = controller.deleteClient(id).block();
+		final ResponseEntity<?> response3 = controller.deleteClient(id).block();
 
 		// Then
 		assertThat(response1.getStatusCode()).isEqualTo(NO_CONTENT);
