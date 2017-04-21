@@ -92,9 +92,9 @@ public class ClientResource {
 	 */
 	@PreAuthorize("#oauth2.hasAnyScope('write','read-write')")
 	@RequestMapping(method = POST, consumes = { APPLICATION_JSON_UTF8_VALUE })
-	public Mono<ResponseEntity<?>> addClient(@RequestBody @Valid Mono<Client> newClient) {
+	public Mono<ResponseEntity<?>> addClient(@RequestBody @Valid Client newClient) {
 
-		return newClient.flatMap(client -> {
+		return Mono.just(newClient).flatMap(client -> {
 
 			return Mono.justOrEmpty(client.getId()).flatMap(id -> repo.exists(id)).defaultIfEmpty(Boolean.FALSE)
 					.flatMap(exists -> {
@@ -128,8 +128,8 @@ public class ClientResource {
 	@PreAuthorize("#oauth2.hasAnyScope('write','read-write')")
 	@RequestMapping(method = PUT, value = "/{id}", consumes = { APPLICATION_JSON_UTF8_VALUE })
 	public Mono<ResponseEntity<?>> updateClient(@PathVariable @NotNull ObjectId id,
-			@RequestBody @Valid Mono<Client> updatedClient) {
-		
+			@RequestBody @Valid Client updatedClient) {
+
 		return repo.exists(id).flatMap(exists -> {
 
 			if (!exists) {
@@ -137,7 +137,9 @@ public class ClientResource {
 						"Client does not exist, to create a new client use POST instead.");
 			}
 
-			return updatedClient.flatMap(client -> repo.save(client)).then(Mono.just(noContent().build()));
+			return Mono.just(updatedClient)
+					.flatMap(client -> repo.save(client))
+					.then(Mono.just(noContent().build()));
 		});
 	}
 

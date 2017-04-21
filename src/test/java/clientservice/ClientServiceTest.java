@@ -2,49 +2,38 @@ package clientservice;
 
 import static clientservice.models.enums.ClientType.PERSON;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
-import static org.springframework.http.HttpMethod.DELETE;
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpMethod.POST;
-import static org.springframework.http.HttpMethod.PUT;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
+import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
+import static org.springframework.web.reactive.function.client.ExchangeFilterFunctions.basicAuthentication;
 
+import java.io.File;
 import java.io.IOException;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
 import java.time.LocalDate;
 import java.time.Month;
 
-import javax.annotation.PostConstruct;
-import javax.net.ssl.SSLContext;
-
-import org.apache.http.client.HttpClient;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.ssl.SSLContextBuilder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.HttpEntity;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.http.client.reactive.ClientHttpConnector;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
+import org.springframework.web.reactive.function.client.ClientResponse;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import clientservice.models.Client;
 
@@ -56,98 +45,103 @@ import clientservice.models.Client;
  * <p>
  * This class tests all CRUD operations in one big method.
  * 
- * @author Djallal Serradji
- *
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = RANDOM_PORT)
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class ClientServiceTest {
 
-	@Autowired
-	private TestRestTemplate restTemplate;
+	@LocalServerPort
+    private int port;
 
-	@Autowired
-	private ObjectMapper mapper;
+	@Value("classpath:servicestore.pem")
+	private Resource pemResource;
 
-	/**
-	 * This is necessary for the self signed certificate to be trusted.<br>
-	 * It has no effect if SSL is not active.
-	 * 
-	 * @throws KeyManagementException
-	 * @throws NoSuchAlgorithmException
-	 * @throws KeyStoreException
-	 * @throws IOException
-	 */
-	@PostConstruct
-	void init() throws Exception {
+	private WebClient createSSLWebClient() throws IOException {
 
-		final SSLContextBuilder ctxBuilder = SSLContextBuilder.create();
-		final SSLContext sslCtx = ctxBuilder.loadTrustMaterial(new TrustSelfSignedStrategy()).build();
-		final SSLConnectionSocketFactory factory = new SSLConnectionSocketFactory(sslCtx);
-		final HttpClient httpClient = HttpClients.custom().setSSLSocketFactory(factory).build();
+		/* Create a Reactor connector and tell it to trust our certificate */
+		final File pemFile = pemResource.getFile();
+		final ClientHttpConnector clientConnector = new ReactorClientHttpConnector(
+				options -> options.sslSupport(builder -> builder.trustManager(pemFile)));
 
-		((HttpComponentsClientHttpRequestFactory) restTemplate.getRestTemplate().getRequestFactory())
-				.setHttpClient(httpClient);
+		/* Build a WebClient with the custom connector */
+		return WebClient.builder()
+				.baseUrl(String.format("https://127.0.0.1:%d", port))
+				.clientConnector(clientConnector)
+				.build();
 	}
 
 	@Test
 	public void testCRUDOperationsAllTogether() throws IOException {
 
+		final WebClient webClient = createSSLWebClient();
+		
 		// Prepare HTTP headers used for requests
 		final HttpHeaders headers = new HttpHeaders();
 		headers.add(ACCEPT, APPLICATION_JSON_UTF8_VALUE);
 		headers.add(CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE);
-		headers.add("Authorization", String.format("Bearer %s", requestToken()));
+		headers.add(AUTHORIZATION, String.format("Bearer %s", requestToken(webClient)));
 
 		final Client newClient = Client.ofType(PERSON).withBirthDate(LocalDate.of(1990, Month.AUGUST, 16)).build();
 
 		// ---------- Create ----------
-		HttpEntity<?> request = new HttpEntity<>(newClient, headers);
-		ResponseEntity<String> response = restTemplate.exchange("/clients", POST, request, String.class);
+		ClientResponse resp = webClient.post().uri("/clients")
+				.headers(headers)
+				.body(newClient)
+				.exchange().block();
 
-		assertThat(response.getStatusCode()).isEqualTo(CREATED);
-		final String newClientUrl = response.getHeaders().get("Location").get(0);
+		assertThat(resp.statusCode()).isEqualTo(CREATED);
+		final String newClientUrl = resp.headers().header("Location").get(0);
 		assertThat(newClientUrl).contains("/clients/");
 
 		// ---------- Read ----------
-		request = new HttpEntity<>(headers);
-		response = restTemplate.exchange(newClientUrl, GET, request, String.class);
-
-		assertThat(response.getStatusCode()).isEqualTo(OK);
-		assertThat(response.getBody()).isNotNull();
-		final Client createdClient = mapper.readValue(response.getBody(), Client.class);
+		resp = webClient.get().uri(newClientUrl).headers(headers).exchange().block();
+		
+		assertThat(resp.statusCode()).isEqualTo(OK);
+		final Client createdClient = resp.bodyToMono(Client.class).block();
 		assertThat(createdClient.getId()).isNotNull();
 
 		// ---------- Update ----------
 		final Client clientToUpdate = Client.from(createdClient).withFirstName("John").withLastName("Doe").build();
-		request = new HttpEntity<>(clientToUpdate, headers);
-		response = restTemplate.exchange(newClientUrl, PUT, request, String.class);
+		resp = webClient.put().uri(newClientUrl)
+				.headers(headers)
+				.body(clientToUpdate)
+				.exchange().block();
 
-		assertThat(response.getStatusCode()).isEqualTo(NO_CONTENT);
-		assertThat(response.getBody()).isNull();
-		response = restTemplate.exchange(newClientUrl, GET, request, String.class);
-		assertThat(response.getStatusCode()).isEqualTo(OK);
-		final Client updatedClient = mapper.readValue(response.getBody(), Client.class);
+		assertThat(resp.statusCode()).isEqualTo(NO_CONTENT);
+		resp = webClient.get().uri(newClientUrl).headers(headers).exchange().block();
+		assertThat(resp.statusCode()).isEqualTo(OK);
+		final Client updatedClient = resp.bodyToMono(Client.class).block();
 		assertThat(updatedClient.getId()).isEqualTo(updatedClient.getId());
 		assertThat(updatedClient.getLastName()).isEqualTo("Doe");
 
 		// ---------- Delete ----------
-		response = restTemplate.exchange(newClientUrl, DELETE, request, String.class);
+		resp = webClient.delete().uri(newClientUrl).headers(headers).exchange().block();
 
-		assertThat(response.getStatusCode()).isEqualTo(NO_CONTENT);
-		assertThat(response.getBody()).isNull();
-		response = restTemplate.exchange(newClientUrl, GET, request, String.class);
-		assertThat(response.getStatusCode()).isEqualTo(NOT_FOUND);
+		assertThat(resp.statusCode()).isEqualTo(NO_CONTENT);
+		resp = webClient.get().uri(newClientUrl).headers(headers).exchange().block();
+		assertThat(resp.statusCode()).isEqualTo(NOT_FOUND);
 	}
 
-	private String requestToken() throws IOException {
+	/**
+	 * Request a OAuth2 token from the Authentication Server
+	 * 
+	 * @param webClient The webClient to connect with
+	 * 
+	 * @return The token
+	 */
+	private String requestToken(WebClient webClient) {
 
-		final MultiValueMap<String, String> postParams = new LinkedMultiValueMap<>();
-		postParams.add("grant_type", "client_credentials");
-
-		final JsonNode resp = restTemplate.withBasicAuth("clientId", "clientSecret").postForObject("/oauth/token",
-				postParams, JsonNode.class);
-
-		return resp.get("access_token").asText();
+		/* Add Basic Authentication to the WebClient */
+		final WebClient webClientAuth = webClient.filter(basicAuthentication("clientId", "clientSecret"));
+		
+		final JsonNode tokenResp = webClientAuth.post().uri("/oauth/token")
+			.contentType(APPLICATION_FORM_URLENCODED)
+			.accept(APPLICATION_JSON_UTF8)
+			.body("grant_type=client_credentials")
+			.exchange()
+			.flatMap(resp -> resp.bodyToMono(JsonNode.class))
+			.block();
+			
+		return tokenResp.get("access_token").asText();
 	}
 }

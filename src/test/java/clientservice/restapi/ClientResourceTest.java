@@ -110,7 +110,7 @@ public class ClientResourceTest {
 		when(repo.save(any(Client.class))).thenReturn(Mono.just(newClient));
 
 		// When
-		final ResponseEntity<?> response = controller.addClient(Mono.just(newClient)).block();
+		final ResponseEntity<?> response = controller.addClient(newClient).block();
 
 		// Then
 		assertThat(response.getStatusCode()).isEqualTo(CREATED);
@@ -128,7 +128,7 @@ public class ClientResourceTest {
 
 		// When
 		// Then
-		assertThatThrownBy(() -> controller.addClient(Mono.just(client)).block())
+		assertThatThrownBy(() -> controller.addClient(client).block())
 				.isInstanceOf(ClientServiceException.class).hasMessageContaining("Client already exists");
 	}
 
@@ -143,7 +143,7 @@ public class ClientResourceTest {
 		ReflectionTestUtils.setField(existingClient, "id", id);
 
 		// When
-		final ResponseEntity<?> response = controller.updateClient(id, Mono.just(existingClient)).block();
+		final ResponseEntity<?> response = controller.updateClient(id, existingClient).block();
 
 		// Then
 		assertThat(response.getStatusCode()).isEqualTo(NO_CONTENT);
@@ -160,7 +160,7 @@ public class ClientResourceTest {
 
 		// When
 		// Then
-		assertThatThrownBy(() -> controller.updateClient(newClient.getId(), Mono.just(newClient)).block())
+		assertThatThrownBy(() -> controller.updateClient(newClient.getId(), newClient).block())
 				.isInstanceOf(ClientServiceException.class).hasMessageContaining("Client does not exist");
 	}
 
