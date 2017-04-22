@@ -24,6 +24,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+import clientservice.ClientServiceExceptionHandler;
 import clientservice.domain.Client;
 import clientservice.repository.mongodb.ClientRepository;
 import reactor.core.publisher.Flux;
@@ -39,7 +40,10 @@ public class ClientResourceIntegrationTest {
 	
 	@Before
 	public void init() {
-		webClient = WebTestClient.bindToController(new ClientResource(repo)).build();
+		webClient = WebTestClient
+				.bindToController(new ClientResource(repo))
+				.controllerAdvice(ClientServiceExceptionHandler.class)  // Doesn't seem to be used hence the HTTP 500 instead of HTTP 400 in some tests
+				.build();
 	}
 
 	@Test
@@ -117,8 +121,9 @@ public class ClientResourceIntegrationTest {
 
 		final String BAD_JSON = "{\"client_type_is_missing\":\"PERSON\"}";
 
-		webClient.post().uri("/clients").contentType(APPLICATION_JSON_UTF8).body(BAD_JSON).exchange().expectStatus()
-				.isBadRequest();	// HTTP 400
+		webClient.post().uri("/clients").contentType(APPLICATION_JSON_UTF8).body(BAD_JSON)
+		.exchange()
+		.expectStatus().isBadRequest();	// HTTP 400
 	}
 
 	@Test
@@ -160,7 +165,7 @@ public class ClientResourceIntegrationTest {
 		webClient.put().uri(String.format("/clients/%s", id)).contentType(APPLICATION_JSON_UTF8).body(UPDATE).exchange()
 				.expectStatus().is5xxServerError(); // HTTP 500 because the
 													// exception handler is not
-													// used yet.
+													// used here.
 	}
 
 	@Test

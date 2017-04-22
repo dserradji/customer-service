@@ -84,10 +84,7 @@ public class ClientServiceTest {
 		final Client newClient = Client.ofType(PERSON).withBirthDate(LocalDate.of(1990, Month.AUGUST, 16)).build();
 
 		// ---------- Create ----------
-		ClientResponse resp = webClient.post().uri("/clients")
-				.headers(headers)
-				.body(newClient)
-				.exchange().block();
+		ClientResponse resp = webClient.post().uri("/clients").headers(headers).body(newClient).exchange().block();
 
 		assertThat(resp.statusCode()).isEqualTo(CREATED);
 		final String newClientUrl = resp.headers().header("Location").get(0);
@@ -102,10 +99,7 @@ public class ClientServiceTest {
 
 		// ---------- Update ----------
 		final Client clientToUpdate = Client.from(createdClient).withFirstName("John").withLastName("Doe").build();
-		resp = webClient.put().uri(newClientUrl)
-				.headers(headers)
-				.body(clientToUpdate)
-				.exchange().block();
+		resp = webClient.put().uri(newClientUrl).headers(headers).body(clientToUpdate).exchange().block();
 
 		assertThat(resp.statusCode()).isEqualTo(NO_CONTENT);
 		resp = webClient.get().uri(newClientUrl).headers(headers).exchange().block();
