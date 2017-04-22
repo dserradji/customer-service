@@ -1,10 +1,10 @@
-package clientservice.models;
+package clientservice.domain;
 
 import static org.assertj.core.api.Assertions.*;
 
 import org.junit.Test;
 
-import clientservice.models.Address;
+import clientservice.domain.Address;
 
 public class AddressTest {
 
@@ -15,7 +15,10 @@ public class AddressTest {
 		final Address address;
 
 		// When
-		address = Address.ofCountry("Shadaloo").withStreetNumber(110).withStreetName("Bison street").withCity("Shadaloo City")
+		address = Address.ofCountry("Shadaloo")
+				.withStreetNumber(110)
+				.withStreetName("Bison street")
+				.withCity("Shadaloo City")
 				.withZipcode("123456").build();
 
 		// Then
@@ -32,8 +35,11 @@ public class AddressTest {
 	public void shouldUpdateAnAddress() {
 
 		// Given
-		Address address = Address.ofCountry("Shadaloo").withStreetNumber(110).withStreetName("Bison street")
-				.withCity("Shadaloo City").withZipcode("123456").build();
+		Address address = Address.ofCountry("Shadaloo")
+				.withStreetNumber(110)
+				.withStreetName("Bison street")
+				.withCity("Shadaloo City")
+				.withZipcode("123456").build();
 
 		// When
 		address = Address.from(address).withStreetNumber(2000).build();

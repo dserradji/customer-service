@@ -1,4 +1,4 @@
-package clientservice.models;
+package clientservice.domain;
 
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -19,36 +19,35 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 
 import clientservice.ClientServiceException;
-import clientservice.models.enums.ClientType;
-import clientservice.models.enums.Gender;
-import clientservice.models.enums.MaritalStatus;
-import clientservice.models.enums.PhoneType;
+import clientservice.domain.enums.ClientType;
+import clientservice.domain.enums.Gender;
+import clientservice.domain.enums.MaritalStatus;
+import clientservice.domain.enums.PhoneType;
 
 /**
  * {@code Client} is a immutable object.
  * <p>
- * Use {@code Client.ofType(ClientType)} to create a new client.
+ * Use {@code Client.ofType(ClientType)} builder to create a new client.
  * <p>
- * In the absence of setters use {@code Client.from(Client)} to update one or
- * more fields of a given client, a copy of that client containing the updated
- * fields is returned.<br>
+ * Use {@code Client.from(myClient)} builder to make a copy of myClient then
+ * update its fields with one of the {@code with*()} methods.<br>
  * <p>
  * Example:<br>
- * {@code Client client = Client.ofType(ClientType.PERSON).firstName("Ken").build();}<br>
- * {@code Client updatedClient = Client.from(client).firstName("Bison").build();}
+ * {@code Client myClient = Client.ofType(ClientType.PERSON).firstName("Ken").build();}<br>
+ * {@code Client myClient = Client.from(myClient).firstName("Bison").build();}
  */
-@JsonDeserialize(using = ClientDeserializer.class)
-@JsonIgnoreProperties(ignoreUnknown=true)
+@JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(Include.NON_NULL)
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
+@JsonDeserialize(using = ClientDeserializer.class)
 public final class Client {
 
-	@JsonSerialize(using=ToStringSerializer.class)
+	@JsonSerialize(using = ToStringSerializer.class)
 	private ObjectId id;
 	private String firstName;
 	private String lastName;
 	private Gender gender;
-	@JsonFormat(shape=Shape.STRING)
+	@JsonFormat(shape = Shape.STRING)
 	private LocalDate birthDate;
 	private MaritalStatus maritalStatus;
 	private Address address;
@@ -119,10 +118,10 @@ public final class Client {
 	/**
 	 * Builds a client object of the provided type.
 	 * <p>
-	 * If the type is {@link clientservice.models.enums.ClientType#COMPANY} then
+	 * If the type is {@link clientservice.domain.enums.ClientType#COMPANY} then
 	 * the field lastName is used to store the company's name.
 	 * <p>
-	 * If the type is {@link clientservice.models.enums.ClientType#COMPANY} then
+	 * If the type is {@link clientservice.domain.enums.ClientType#COMPANY} then
 	 * the following fields are not relevant:
 	 * <p>
 	 * <ul>
@@ -134,7 +133,7 @@ public final class Client {
 	 * 
 	 * @param clientType
 	 *            The type of the client, listed in the enumeration
-	 *            {@link clientservice.models.enums.ClientType}
+	 *            {@link clientservice.domain.enums.ClientType}
 	 * @return A builder object
 	 */
 	static public Builder ofType(ClientType clientType) {
@@ -213,13 +212,13 @@ public final class Client {
 		}
 
 		/**
-		 * Adds a phone of the given type along with its number to a list of
-		 * phones.
+		 * Add a phone to the client's list of phones.<br>
+		 * A phone consists of a a pair of (phone type, phone number).
 		 * <p>
 		 * The list is backed by a map where the phone type is the key so only
 		 * one number per type can exist.
 		 * <p>
-		 * The types are listed in the enumeration {@link PhoneType}
+		 * The available types are listed in the enumeration {@link PhoneType}
 		 * 
 		 * @param type
 		 *            The type of the phone

@@ -1,4 +1,4 @@
-package clientservice.models;
+package clientservice.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -9,28 +9,20 @@ import java.time.Month;
 
 import org.bson.types.ObjectId;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import clientservice.ClientServiceException;
-import clientservice.models.enums.ClientType;
-import clientservice.models.enums.Gender;
-import clientservice.models.enums.MaritalStatus;
-import clientservice.models.enums.PhoneType;
+import clientservice.domain.enums.ClientType;
+import clientservice.domain.enums.Gender;
+import clientservice.domain.enums.MaritalStatus;
+import clientservice.domain.enums.PhoneType;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = WebEnvironment.NONE)
 public class ClientDeserializerTest {
 
-	@Autowired
-	private ObjectMapper mapper;
+	private ObjectMapper mapper = new ObjectMapper();
 
 	final String id = "{\"id\":\"58e94dffebbd721e30c97d3d\",\"client_type\":\"PERSON\"}";
 

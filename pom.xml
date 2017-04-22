@@ -80,14 +80,6 @@
 			<artifactId>spring-security-oauth2</artifactId>
 		</dependency>
 
-		<!-- Needed for integration tests with HTTPS -->
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpclient</artifactId>
-			<scope>test</scope>
-		</dependency>
-
-
 	</dependencies>
 
 	<build>

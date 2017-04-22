@@ -1,4 +1,4 @@
-package clientservice.models;
+package clientservice.domain;
 
 import org.springframework.http.HttpStatus;
 
@@ -7,15 +7,14 @@ import clientservice.ClientServiceException;
 /**
  * {@code Address} is an immutable object.
  * <p>
- * Use {@code Address.ofCountry(String)} to create a new address.
+ * Use {@code Address.ofCountry(String)} builder to create a new address.
  * <p>
- * In the absence of setters use {@code Address.from(Address)} to update one or
- * more fields of a given address, a copy of that address containing the updated
- * fields is returned.<br>
+ * Use {@code Address.from(myAddress)} builder to make a copy of myAddress then
+ * update its fields with one of the {@code with*()} methods.<br>
  * <p>
  * Example:<br>
- * {@code Address address = Address.ofCountry("Canada").streetNumber(100).build();}<br>
- * {@code address = Address.from(address).streetNumber(200).build();}
+ * {@code Address myAddress = Address.ofCountry("Canada").streetNumber(100).build();}<br>
+ * {@code myAddress = Address.from(myAddress).streetNumber(200).build(); // Street number changed}
  *
  */
 public final class Address {

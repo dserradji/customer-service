@@ -1,12 +1,13 @@
 package clientservice.restapi;
 
-import static clientservice.models.enums.ClientType.COMPANY;
-import static clientservice.models.enums.ClientType.PERSON;
+import static clientservice.domain.enums.ClientType.COMPANY;
+import static clientservice.domain.enums.ClientType.PERSON;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -25,9 +26,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import clientservice.ClientServiceException;
-import clientservice.models.Client;
-import clientservice.models.enums.ClientType;
-import clientservice.repositories.mongodb.ClientRepository;
+import clientservice.domain.Client;
+import clientservice.domain.enums.ClientType;
+import clientservice.repository.mongodb.ClientRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -129,7 +130,8 @@ public class ClientResourceTest {
 		// When
 		// Then
 		assertThatThrownBy(() -> controller.addClient(client).block())
-				.isInstanceOf(ClientServiceException.class).hasMessageContaining("Client already exists");
+			.isInstanceOf(ClientServiceException.class)
+			.hasMessageContaining("Client already exists");
 	}
 
 	@Test
@@ -193,6 +195,7 @@ public class ClientResourceTest {
 		final ResponseEntity<?> response3 = controller.deleteClient(id).block();
 
 		// Then
+		verify(repo).delete(any(ObjectId.class)); // Must be called only once
 		assertThat(response1.getStatusCode()).isEqualTo(NO_CONTENT);
 		assertThat(response2.getStatusCode()).isEqualTo(NO_CONTENT);
 		assertThat(response3.getStatusCode()).isEqualTo(NO_CONTENT);

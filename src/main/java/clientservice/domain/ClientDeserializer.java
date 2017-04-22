@@ -1,4 +1,4 @@
-package clientservice.models;
+package clientservice.domain;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
@@ -14,15 +14,14 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 
-import clientservice.models.enums.ClientType;
-import clientservice.models.enums.Gender;
-import clientservice.models.enums.MaritalStatus;
-import clientservice.models.enums.PhoneType;
+import clientservice.domain.enums.ClientType;
+import clientservice.domain.enums.Gender;
+import clientservice.domain.enums.MaritalStatus;
+import clientservice.domain.enums.PhoneType;
+
 
 /**
  * Custom deserializer (JSON to Java) for the Client object
- * <p>
- * We need this deserializer because we are using a Builder for Client
  * <p>
  * Unknown fields will be ignored and deserialization will try to map known
  * fields and build a Client object, if all mandatory fields are provided the

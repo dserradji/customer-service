@@ -1,6 +1,6 @@
 package clientservice;
 
-import static clientservice.models.enums.ClientType.PERSON;
+import static clientservice.domain.enums.ClientType.PERSON;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
@@ -35,13 +35,13 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import clientservice.models.Client;
+import clientservice.domain.Client;
 
 /**
  * Top to bottom integration test.
  * <p>
- * For this test the application server (specified in pom.xml) will be started
- * and the service deployed.
+ * The application server (specified in pom.xml) is started and the service
+ * deployed.
  * <p>
  * This class tests all CRUD operations in one big method.
  * 

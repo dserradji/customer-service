@@ -1,4 +1,4 @@
-package clientservice.models;
+package clientservice.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -9,10 +9,12 @@ import java.time.Month;
 
 import org.junit.Test;
 
-import clientservice.models.enums.ClientType;
-import clientservice.models.enums.Gender;
-import clientservice.models.enums.MaritalStatus;
-import clientservice.models.enums.PhoneType;
+import clientservice.domain.Address;
+import clientservice.domain.Client;
+import clientservice.domain.enums.ClientType;
+import clientservice.domain.enums.Gender;
+import clientservice.domain.enums.MaritalStatus;
+import clientservice.domain.enums.PhoneType;
 
 public class ClientTest {
 
@@ -21,15 +23,26 @@ public class ClientTest {
 
 		// Given
 		final Client client;
-		final Address address = Address.ofCountry("Shadaloo").withStreetNumber(110).withStreetName("Bison street")
-				.withCity("Shadaloo City").withZipcode("123456").build();
+		final Address address = Address.ofCountry("Shadaloo")
+				.withStreetNumber(110)
+				.withStreetName("Bison street")
+				.withCity("Shadaloo City")
+				.withZipcode("123456").build();
 
 		// When
-		client = Client.ofType(ClientType.PERSON).withFirstName("Ken").withLastName("Masters").withGender(Gender.MALE)
-				.withBirthDate(LocalDate.of(1990, Month.MARCH, 16)).withMaritalStatus(MaritalStatus.SINGLE).withAddress(address)
-				.withPhone(PhoneType.HOME, "111111111").withPhone(PhoneType.CELLULAR, "222222222")
-				.withPhone(PhoneType.OFFICE, "333333333 Ext123").withPhone(PhoneType.FAX, "444444444")
-				.withEmail("kmasters@streetf.com").build();
+		client = Client.ofType(ClientType.PERSON)
+				.withFirstName("Ken")
+				.withLastName("Masters")
+				.withGender(Gender.MALE)
+				.withBirthDate(LocalDate.of(1990, Month.MARCH, 16))
+				.withMaritalStatus(MaritalStatus.SINGLE)
+				.withAddress(address)
+				.withPhone(PhoneType.HOME, "111111111")
+				.withPhone(PhoneType.CELLULAR, "222222222")
+				.withPhone(PhoneType.OFFICE, "333333333 Ext123")
+				.withPhone(PhoneType.FAX, "444444444")
+				.withEmail("kmasters@streetf.com")
+				.build();
 
 		// Then
 		assertThat(client).isNotNull();
@@ -53,14 +66,23 @@ public class ClientTest {
 
 		// Given
 		final Client client;
-		final Address address = Address.ofCountry("Shadaloo").withStreetNumber(110).withStreetName("Bison street")
-				.withCity("Shadaloo City").withZipcode("123456").build();
+		final Address address = Address.ofCountry("Shadaloo")
+				.withStreetNumber(110)
+				.withStreetName("Bison street")
+				.withCity("Shadaloo City")
+				.withZipcode("123456")
+				.build();
 
 		// When
-		client = Client.ofType(ClientType.COMPANY).withLastName("Acme Corp.").withAddress(address)
-				.withPhone(PhoneType.HOME, "111111111").withPhone(PhoneType.CELLULAR, "222222222")
-				.withPhone(PhoneType.OFFICE, "333333333 Ext123").withPhone(PhoneType.FAX, "444444444")
-				.withEmail("kmasters@streetf.com").build();
+		client = Client.ofType(ClientType.COMPANY)
+				.withLastName("Acme Corp.")
+				.withAddress(address)
+				.withPhone(PhoneType.HOME, "111111111")
+				.withPhone(PhoneType.CELLULAR, "222222222")
+				.withPhone(PhoneType.OFFICE, "333333333 Ext123")
+				.withPhone(PhoneType.FAX, "444444444")
+				.withEmail("kmasters@streetf.com")
+				.build();
 
 		// Then
 		assertThat(client).isNotNull();
@@ -85,10 +107,15 @@ public class ClientTest {
 		final Address address = Address.ofCountry("Shadaloo").withStreetNumber(110).withStreetName("Bison street")
 				.withCity("Shadaloo City").withZipcode("123456").build();
 
-		Client client = Client.ofType(ClientType.COMPANY).withLastName("Acme Corp.").withAddress(address)
-				.withPhone(PhoneType.HOME, "111111111").withPhone(PhoneType.CELLULAR, "222222222")
-				.withPhone(PhoneType.OFFICE, "333333333 Ext123").withPhone(PhoneType.FAX, "444444444")
-				.withEmail("kmasters@streetf.com").build();
+		Client client = Client.ofType(ClientType.COMPANY)
+				.withLastName("Acme Corp.")
+				.withAddress(address)
+				.withPhone(PhoneType.HOME, "111111111")
+				.withPhone(PhoneType.CELLULAR, "222222222")
+				.withPhone(PhoneType.OFFICE, "333333333 Ext123")
+				.withPhone(PhoneType.FAX, "444444444")
+				.withEmail("kmasters@streetf.com")
+				.build();
 
 		// When
 		client = Client.from(client).withLastName("Acme Inc.").build();

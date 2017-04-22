@@ -1,22 +1,24 @@
-package clientservice.repositories.mongodb;
+package clientservice.repository.mongodb;
 
-import static clientservice.models.enums.ClientType.COMPANY;
-import static clientservice.models.enums.ClientType.PERSON;
+import static clientservice.domain.enums.ClientType.COMPANY;
+import static clientservice.domain.enums.ClientType.PERSON;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import clientservice.ClientService;
-import clientservice.models.Address;
-import clientservice.models.Client;
+import clientservice.domain.Address;
+import clientservice.domain.Client;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = ClientService.class)
+@Import(ClientService.class)
+@TestPropertySource(locations = "classpath:application.properties")
 public class ClientRepositoryTest {
 
 	@Autowired

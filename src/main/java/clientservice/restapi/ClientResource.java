@@ -27,8 +27,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import clientservice.ClientServiceException;
-import clientservice.models.Client;
-import clientservice.repositories.mongodb.ClientRepository;
+import clientservice.domain.Client;
+import clientservice.repository.mongodb.ClientRepository;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -52,22 +52,19 @@ public class ClientResource {
 	@RequestMapping(method = GET)
 	public Mono<ResponseEntity<List<Client>>> allClients() {
 
-		return repo.findAll().collectList().flatMap(clients -> {
-			if (clients.size() > 0) {
-				return Mono.just(ok(clients));
-			} else {
-				return Mono.just(noContent().build());
-			}
-		});
+		return repo.findAll().collectList()
+				.filter(clients -> clients.size() > 0)
+				.map(clients -> ok(clients))
+				.defaultIfEmpty(noContent().build());
 	}
 
 	/**
-	 * Query for the client with the given Id.
+	 * Query for a client with the given Id.
 	 * <p>
 	 * This method is idempotent.
 	 * 
 	 * @param id
-	 *            The id of the client.
+	 *            The id of the client to look for.
 	 * 
 	 * @return HTTP 200 if the client is found or HTTP 404 otherwise.
 	 */
@@ -75,10 +72,9 @@ public class ClientResource {
 	@RequestMapping(method = GET, value = "/{id}")
 	public Mono<ResponseEntity<Client>> oneClient(@PathVariable @NotNull ObjectId id) {
 
-		return repo
-				.findOne(id)
-				.flatMap(client -> Mono.just(ok().contentType(APPLICATION_JSON_UTF8).body(client)))
-				.switchIfEmpty(Mono.just(notFound().build()));
+		return repo.findOne(id)
+				.map(client -> ok().contentType(APPLICATION_JSON_UTF8).body(client))
+				.defaultIfEmpty(notFound().build());
 	}
 
 	/**
@@ -94,21 +90,20 @@ public class ClientResource {
 	@RequestMapping(method = POST, consumes = { APPLICATION_JSON_UTF8_VALUE })
 	public Mono<ResponseEntity<?>> addClient(@RequestBody @Valid Client newClient) {
 
-		return Mono.just(newClient).flatMap(client -> {
+		return Mono.justOrEmpty(newClient.getId())
+				.flatMap(id -> repo.exists(id))
+				.defaultIfEmpty(Boolean.FALSE)
+				.flatMap(exists -> {
 
-			return Mono.justOrEmpty(client.getId()).flatMap(id -> repo.exists(id)).defaultIfEmpty(Boolean.FALSE)
-					.flatMap(exists -> {
+					if (exists) {
+						throw new ClientServiceException(HttpStatus.BAD_REQUEST,
+								"Client already exists, to update an existing client use PUT instead.");
+					}
 
-						if (exists) {
-							throw new ClientServiceException(HttpStatus.BAD_REQUEST,
-									"Client already exists, to update an existing client use PUT instead.");
-						}
-
-						return repo.save(client).flatMap(created -> {
-							return Mono.just(created(URI.create(format("/clients/%s", created.getId()))).build());
-						});
+					return repo.save(newClient).map(saved -> {
+						return created(URI.create(format("/clients/%s", saved.getId()))).build();
 					});
-		});
+				});
 	}
 
 	/**
@@ -128,7 +123,7 @@ public class ClientResource {
 	@PreAuthorize("#oauth2.hasAnyScope('write','read-write')")
 	@RequestMapping(method = PUT, value = "/{id}", consumes = { APPLICATION_JSON_UTF8_VALUE })
 	public Mono<ResponseEntity<?>> updateClient(@PathVariable @NotNull ObjectId id,
-			@RequestBody @Valid Client updatedClient) {
+			@RequestBody @Valid Client clientToUpdate) {
 
 		return repo.exists(id).flatMap(exists -> {
 
@@ -137,9 +132,7 @@ public class ClientResource {
 						"Client does not exist, to create a new client use POST instead.");
 			}
 
-			return Mono.just(updatedClient)
-					.flatMap(client -> repo.save(client))
-					.then(Mono.just(noContent().build()));
+			return repo.save(clientToUpdate).then(Mono.just(noContent().build()));
 		});
 	}
 
@@ -160,7 +153,9 @@ public class ClientResource {
 
 		final Mono<ResponseEntity<?>> noContent = Mono.just(noContent().build());
 
-		return repo.exists(id).filter(Boolean::valueOf).flatMap(exists -> repo.delete(id).then(noContent))
+		return repo.exists(id)
+				.filter(Boolean::valueOf) // Delete only if client exists
+				.flatMap(exists -> repo.delete(id).then(noContent))
 				.switchIfEmpty(noContent);
 	}
 }

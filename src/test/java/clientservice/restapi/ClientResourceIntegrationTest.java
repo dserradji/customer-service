@@ -1,7 +1,7 @@
 package clientservice.restapi;
 
-import static clientservice.models.enums.ClientType.COMPANY;
-import static clientservice.models.enums.ClientType.PERSON;
+import static clientservice.domain.enums.ClientType.COMPANY;
+import static clientservice.domain.enums.ClientType.PERSON;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -24,8 +24,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
-import clientservice.models.Client;
-import clientservice.repositories.mongodb.ClientRepository;
+import clientservice.domain.Client;
+import clientservice.repository.mongodb.ClientRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
