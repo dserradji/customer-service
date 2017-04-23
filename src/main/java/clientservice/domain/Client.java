@@ -1,5 +1,7 @@
 package clientservice.domain;
 
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
@@ -7,7 +9,6 @@ import java.util.Map;
 import javax.validation.constraints.NotNull;
 
 import org.bson.types.ObjectId;
-import org.springframework.http.HttpStatus;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
@@ -106,6 +107,11 @@ public final class Client {
 		return clientType;
 	}
 
+	/**
+	 * Make a copie of the map then return it so the reference does not escape.
+	 * 
+	 * @return A copie of the map
+	 */
 	public Map<PhoneType, String> getPhones() {
 		
 		if (phones == null) {
@@ -114,6 +120,7 @@ public final class Client {
 		
 		final Map<PhoneType, String> copie = new HashMap<>();
 		phones.forEach((key, value) -> copie.put(key, value));
+		
 		return copie;
 	}
 
@@ -177,7 +184,7 @@ public final class Client {
 
 		public Builder(ClientType clientType) {
 			if (clientType == null) {
-				throw new ClientServiceException(HttpStatus.BAD_REQUEST, "Client type can not be null.");
+				throw new ClientServiceException(BAD_REQUEST, "Client type can not be null.");
 			}
 			this.clientType = clientType;
 		}
