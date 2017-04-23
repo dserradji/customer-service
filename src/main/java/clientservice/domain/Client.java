@@ -107,6 +107,11 @@ public final class Client {
 	}
 
 	public Map<PhoneType, String> getPhones() {
+		
+		if (phones == null) {
+			return phones;
+		}
+		
 		final Map<PhoneType, String> copie = new HashMap<>();
 		phones.forEach((key, value) -> copie.put(key, value));
 		return copie;
@@ -166,7 +171,7 @@ public final class Client {
 		private LocalDate birthDate;
 		private MaritalStatus maritalStatus;
 		private Address address;
-		private Map<PhoneType, String> phones = new HashMap<>();
+		private Map<PhoneType, String> phones;
 		private String email;
 		private ClientType clientType;
 
@@ -227,6 +232,11 @@ public final class Client {
 		 *            The phone number
 		 */
 		public Builder withPhone(PhoneType phonetype, String number) {
+			
+			if (phones == null) {
+				phones = new HashMap<>();
+			}
+			
 			this.phones.put(phonetype, number);
 			return this;
 		}

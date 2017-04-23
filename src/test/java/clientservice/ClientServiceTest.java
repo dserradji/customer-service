@@ -75,7 +75,6 @@ public class ClientServiceTest {
 
 		final WebClient webClient = createSSLWebClient();
 		
-		// Prepare HTTP headers used for requests
 		final HttpHeaders headers = new HttpHeaders();
 		headers.add(ACCEPT, APPLICATION_JSON_UTF8_VALUE);
 		headers.add(CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE);

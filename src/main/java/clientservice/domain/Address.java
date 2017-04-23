@@ -2,6 +2,9 @@ package clientservice.domain;
 
 import org.springframework.http.HttpStatus;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
 import clientservice.ClientServiceException;
 
 /**
@@ -17,9 +20,10 @@ import clientservice.ClientServiceException;
  * {@code myAddress = Address.from(myAddress).streetNumber(200).build(); // Street number changed}
  *
  */
+@JsonInclude(Include.NON_NULL)
 public final class Address {
 
-	private int streetNumber;
+	private Integer streetNumber;
 	private String streetName;
 	private String city;
 	private String zipcode;
@@ -30,7 +34,7 @@ public final class Address {
 		// Needed for Spring Data and Jackson serialization
 	}
 
-	private Address(int streetNumber, String streetName, String city, String zipcode, String stateOrProvince,
+	private Address(Integer streetNumber, String streetName, String city, String zipcode, String stateOrProvince,
 			String country) {
 		this.streetNumber = streetNumber;
 		this.streetName = streetName;
@@ -56,7 +60,7 @@ public final class Address {
 
 	public static final class Builder {
 
-		private int streetNumber;
+		private Integer streetNumber;
 		private String streetName;
 		private String city;
 		private String zipcode;
@@ -70,7 +74,7 @@ public final class Address {
 			this.country = country;
 		}
 
-		public Builder withStreetNumber(int streetNumber) {
+		public Builder withStreetNumber(Integer streetNumber) {
 			this.streetNumber = streetNumber;
 			return this;
 		}
@@ -100,7 +104,7 @@ public final class Address {
 		}
 	}
 
-	public int getStreetNumber() {
+	public Integer getStreetNumber() {
 		return streetNumber;
 	}
 
