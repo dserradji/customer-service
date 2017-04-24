@@ -31,12 +31,12 @@ import clientservice.domain.enums.PhoneType;
  * <p>
  * Use {@code Client.ofType(ClientType)} builder to create a new client.
  * <p>
- * Use {@code Client.from(myClient)} builder to make a copy of myClient then
- * update its fields with one of the {@code with*()} methods.<br>
+ * Use {@code Client.from(myClient)} builder  to initiate a builder with a copy of myClient then
+ * update its fields with one of the {@code with*()} methods before calling {@code build()} method.<br>
  * <p>
  * Example:<br>
- * {@code Client myClient = Client.ofType(ClientType.PERSON).firstName("Ken").build();}<br>
- * {@code Client myClient = Client.from(myClient).firstName("Bison").build();}
+ * {@code Client myClient = Client.ofType(ClientType.PERSON).withFirstName("Ken").build();}<br>
+ * {@code Client myClient = Client.from(myClient).withFirstName("Bison").build(); // First name changed}
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(Include.NON_NULL)

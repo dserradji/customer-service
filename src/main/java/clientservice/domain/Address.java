@@ -12,12 +12,12 @@ import clientservice.ClientServiceException;
  * <p>
  * Use {@code Address.ofCountry(String)} builder to create a new address.
  * <p>
- * Use {@code Address.from(myAddress)} builder to make a copy of myAddress then
- * update its fields with one of the {@code with*()} methods.<br>
+ * Use {@code Address.from(myAddress)} builder to initiate a builder with a copy of myAddress then
+ * update its fields with one of the {@code with*()} methods before calling {@code build()} method.<br>
  * <p>
  * Example:<br>
- * {@code Address myAddress = Address.ofCountry("Canada").streetNumber(100).build();}<br>
- * {@code myAddress = Address.from(myAddress).streetNumber(200).build(); // Street number changed}
+ * {@code Address myAddress = Address.ofCountry("Canada").withStreetNumber(100).build();}<br>
+ * {@code myAddress = Address.from(myAddress).withStreetNumber(200).build(); // Street number changed}
  *
  */
 @JsonInclude(Include.NON_NULL)
