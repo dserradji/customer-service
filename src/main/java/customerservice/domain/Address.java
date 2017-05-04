@@ -1,6 +1,10 @@
 package customerservice.domain;
 
+import javax.validation.constraints.NotNull;
+
 import org.springframework.http.HttpStatus;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import customerservice.CustomerServiceException;
 
@@ -17,6 +21,7 @@ import customerservice.CustomerServiceException;
  * {@code myAddress = Address.from(myAddress).withStreetNumber(200).build(); // Street number changed}
  *
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public final class Address {
 
 	private int streetNumber;
@@ -24,6 +29,7 @@ public final class Address {
 	private String city;
 	private String zipcode;
 	private String stateOrProvince;
+	@NotNull
 	private String country;
 
 	private Address() {

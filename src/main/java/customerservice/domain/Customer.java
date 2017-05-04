@@ -4,10 +4,12 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.validation.constraints.NotNull;
+
 import org.bson.types.ObjectId;
 import org.springframework.http.HttpStatus;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import customerservice.CustomerServiceException;
 import customerservice.domain.enums.CustomerType;
@@ -27,7 +29,7 @@ import customerservice.domain.enums.PhoneType;
  * {@code Customer myCustomer = Customer.ofType(CustomerType.PERSON).withFirstName("Ken").build();}<br>
  * {@code Customer myCustomer = Customer.from(myCustomer).withFirstName("Bison").build(); // First name changed}
  */
-@JsonDeserialize(using = CustomerDeserializer.class)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public final class Customer {
 
 	private ObjectId id;
@@ -39,6 +41,7 @@ public final class Customer {
 	private Address address;
 	private Map<PhoneType, String> phones;
 	private String email;
+	@NotNull
 	private CustomerType customerType;
 
 	private Customer() {

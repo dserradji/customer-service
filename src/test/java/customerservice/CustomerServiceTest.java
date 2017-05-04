@@ -37,6 +37,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -44,7 +45,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import customerservice.domain.Customer;
 
@@ -63,9 +63,6 @@ public class CustomerServiceTest {
 
 	@Autowired
 	private TestRestTemplate restTemplate;
-
-	@Autowired
-	private ObjectMapper mapper;
 
 	/**
 	 * This is necessary for the self signed certificate to be trusted.<br>
@@ -101,7 +98,7 @@ public class CustomerServiceTest {
 
 		// ---------- Create ----------
 		HttpEntity<?> request = new HttpEntity<>(newCustomer, headers);
-		ResponseEntity<String> response = restTemplate.exchange("/customers", POST, request, String.class);
+		ResponseEntity<Customer> response = restTemplate.exchange("/customers", POST, request, Customer.class);
 
 		assertThat(response.getStatusCode()).isEqualTo(CREATED);
 		final String newCustomerUrl = response.getHeaders().get("Location").get(0);
@@ -109,32 +106,32 @@ public class CustomerServiceTest {
 
 		// ---------- Read ----------
 		request = new HttpEntity<>(headers);
-		response = restTemplate.exchange(newCustomerUrl, GET, request, String.class);
+		response = restTemplate.exchange(newCustomerUrl, GET, request, Customer.class);
 
 		assertThat(response.getStatusCode()).isEqualTo(OK);
 		assertThat(response.getBody()).isNotNull();
-		final Customer createdCustomer = mapper.readValue(response.getBody(), Customer.class);
+		final Customer createdCustomer = response.getBody();
 		assertThat(createdCustomer.getId()).isNotNull();
 
 		// ---------- Update ----------
 		final Customer customerToUpdate = Customer.from(createdCustomer).withFirstName("John").withLastName("Doe").build();
 		request = new HttpEntity<>(customerToUpdate, headers);
-		response = restTemplate.exchange(newCustomerUrl, PUT, request, String.class);
+		response = restTemplate.exchange(newCustomerUrl, PUT, request, Customer.class);
 
 		assertThat(response.getStatusCode()).isEqualTo(NO_CONTENT);
 		assertThat(response.getBody()).isNull();
-		response = restTemplate.exchange(newCustomerUrl, GET, request, String.class);
+		response = restTemplate.exchange(newCustomerUrl, GET, request, Customer.class);
 		assertThat(response.getStatusCode()).isEqualTo(OK);
-		final Customer updatedCustomer = mapper.readValue(response.getBody(), Customer.class);
+		final Customer updatedCustomer = response.getBody();
 		assertThat(updatedCustomer.getId()).isEqualTo(updatedCustomer.getId());
 		assertThat(updatedCustomer.getLastName()).isEqualTo("Doe");
 
 		// ---------- Delete ----------
-		response = restTemplate.exchange(newCustomerUrl, DELETE, request, String.class);
+		response = restTemplate.exchange(newCustomerUrl, DELETE, request, Customer.class);
 
 		assertThat(response.getStatusCode()).isEqualTo(NO_CONTENT);
 		assertThat(response.getBody()).isNull();
-		response = restTemplate.exchange(newCustomerUrl, GET, request, String.class);
+		response = restTemplate.exchange(newCustomerUrl, GET, request, Customer.class);
 		assertThat(response.getStatusCode()).isEqualTo(NOT_FOUND);
 	}
 
@@ -151,9 +148,14 @@ public class CustomerServiceTest {
 		final MultiValueMap<String, String> postParams = new LinkedMultiValueMap<>();
 		postParams.add("grant_type", "client_credentials");
 
-		final JsonNode resp = restTemplate.withBasicAuth("clientId", "clientSecret").postForObject("/oauth/token",
-				postParams, JsonNode.class);
+		final ResponseEntity<JsonNode> resp = restTemplate.withBasicAuth("clientId", "clientSecret")
+				.postForEntity("/oauth/token", postParams, JsonNode.class);
 
-		return resp.get("access_token").asText();
+		if (HttpStatus.OK != resp.getStatusCode()) {
+			throw new CustomerServiceException(
+					resp.getStatusCode(), "Authentication error");
+		}
+		
+		return resp.getBody().get("access_token").asText();
 	}
 }
