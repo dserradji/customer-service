@@ -1,7 +1,7 @@
 Generate a key + keystore
 -------------------------
 
-keytool -genkey -alias clientservice -keyalg RSA -keysize 2048 -keystore servicestore.jks -validity 3650
+keytool -genkey -alias customerservice -keyalg RSA -keysize 2048 -keystore servicestore.jks -validity 3650
 
 pwd: qwerty
 first and last name: localhost (THIS IS IMPORTANT)
@@ -9,8 +9,8 @@ all other fields can be left to Unknown
 
 Generate security certificates to use with cURL when HTTPS+OAuth2
 -----------------------------------------------------------------
-keytool -exportcert -rfc -keystore servicestore.jks -storepass qwerty -alias clientservice > servicestore.pem
-keytool -importkeystore -srckeystore servicestore.jks -destkeystore servicestore.pfx -deststoretype PKCS12 -srcalias clientservice -deststorepass qwerty -destkeypass qwerty
+keytool -exportcert -rfc -keystore servicestore.jks -storepass qwerty -alias customerservice > servicestore.pem
+keytool -importkeystore -srckeystore servicestore.jks -destkeystore servicestore.pfx -deststoretype PKCS12 -srcalias customerservice -deststorepass qwerty -destkeypass qwerty
 openssl pkcs12 -in servicestore.pfx -out servicestore.p12 -nodes
 
 cURL
