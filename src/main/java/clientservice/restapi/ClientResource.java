@@ -67,7 +67,7 @@ public class ClientResource {
 	@RequestMapping(method = GET, value = "/{id}")
 	public ResponseEntity<?> oneClient(@PathVariable @NotNull ObjectId id) {
 
-		return repo.findOne(id).map(client -> ok(client)).orElse(notFound().build());
+		return repo.findById(id).map(client -> ok(client)).orElse(notFound().build());
 	}
 
 	/**
@@ -83,7 +83,7 @@ public class ClientResource {
 	@RequestMapping(method = POST, consumes = { APPLICATION_JSON_UTF8_VALUE })
 	public ResponseEntity<?> addClient(@RequestBody @Valid Client newClient) {
 
-		if (newClient.getId() != null && repo.exists(newClient.getId())) {
+		if (newClient.getId() != null && repo.existsById(newClient.getId())) {
 			throw new ClientServiceException(HttpStatus.BAD_REQUEST,
 					"Client already exists, to update an existing client use PUT instead.");
 		}
@@ -110,7 +110,7 @@ public class ClientResource {
 	@RequestMapping(method = PUT, value = "/{id}", consumes = { APPLICATION_JSON_UTF8_VALUE })
 	public ResponseEntity<?> updateClient(@PathVariable @NotNull ObjectId id, @RequestBody @Valid Client update) {
 
-		if (!repo.exists(id)) {
+		if (!repo.existsById(id)) {
 			throw new ClientServiceException(HttpStatus.BAD_REQUEST,
 					"Client does not exist, to create a new client use POST instead.");
 		}
@@ -134,8 +134,8 @@ public class ClientResource {
 	@RequestMapping(method = DELETE, value = "/{id}")
 	public ResponseEntity<?> deleteClient(@PathVariable @NotNull ObjectId id) {
 
-		if (repo.exists(id)) {
-			repo.delete(id);
+		if (repo.existsById(id)) {
+			repo.deleteById(id);
 		}
 
 		return noContent().build();

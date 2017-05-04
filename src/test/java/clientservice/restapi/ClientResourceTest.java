@@ -74,7 +74,7 @@ public class ClientResourceTest {
 
 		// Given
 		final Client client = Client.ofType(PERSON).build();
-		when(repo.findOne(any(ObjectId.class))).thenReturn(Optional.of(client));
+		when(repo.findById(any(ObjectId.class))).thenReturn(Optional.of(client));
 
 		// When
 		final ResponseEntity<?> response = controller.oneClient(ObjectId.get());
@@ -88,7 +88,7 @@ public class ClientResourceTest {
 	public void shouldReturn404IfClientIsNotFound() {
 
 		// Given
-		when(repo.findOne(any(ObjectId.class))).thenReturn(Optional.empty());
+		when(repo.findById(any(ObjectId.class))).thenReturn(Optional.empty());
 
 		// When
 		final ResponseEntity<?> response = controller.oneClient(ObjectId.get());
@@ -121,7 +121,7 @@ public class ClientResourceTest {
 	public void shouldNotAddAClientIfClientAlreadyExists() throws Exception {
 
 		// Given
-		when(repo.exists(any(ObjectId.class))).thenReturn(true);
+		when(repo.existsById(any(ObjectId.class))).thenReturn(true);
 		final ObjectId id = ObjectId.get();
 		final Client client = Client.ofType(PERSON).build();
 		ReflectionTestUtils.setField(client, "id", id);
@@ -136,7 +136,7 @@ public class ClientResourceTest {
 	public void shouldUpdateAnExistingClient() {
 
 		// Given
-		when(repo.exists(any(ObjectId.class))).thenReturn(true);
+		when(repo.existsById(any(ObjectId.class))).thenReturn(true);
 		when(repo.save(any(Client.class))).thenReturn(Client.ofType(PERSON).build());
 		final ObjectId id = ObjectId.get();
 		final Client existingClient = Client.ofType(ClientType.PERSON).build();
@@ -153,7 +153,7 @@ public class ClientResourceTest {
 	public void shouldFailUpdatingNonExistingClient() {
 
 		// Given
-		when(repo.exists(any(ObjectId.class))).thenReturn(false);
+		when(repo.existsById(any(ObjectId.class))).thenReturn(false);
 		final ObjectId id = ObjectId.get();
 		final Client newClient = Client.ofType(ClientType.PERSON).build();
 		ReflectionTestUtils.setField(newClient, "id", id);
@@ -168,7 +168,7 @@ public class ClientResourceTest {
 	public void shouldDeleteAnExistingClient() {
 
 		// Given
-		when(repo.exists(any(ObjectId.class))).thenReturn(true);
+		when(repo.existsById(any(ObjectId.class))).thenReturn(true);
 		final ObjectId id = ObjectId.get();
 
 		// When
@@ -182,7 +182,7 @@ public class ClientResourceTest {
 	public void shouldDeleteExistingClientAndIgnoreSubsequentCalls() throws Exception {
 
 		// Given
-		when(repo.exists(any(ObjectId.class))).thenReturn(true).thenReturn(false);
+		when(repo.existsById(any(ObjectId.class))).thenReturn(true).thenReturn(false);
 		final ObjectId id = ObjectId.get();
 
 		// When

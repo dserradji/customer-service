@@ -59,7 +59,7 @@ public class ClientRepositoryTest {
 				.save(Client.ofType(PERSON).withFirstName("Ken").withLastName("Masters").withAddress(address).build());
 
 		// When
-		final Client retrieved = repo.findOne(saved.getId()).get();
+		final Client retrieved = repo.findById(saved.getId()).get();
 
 		// Then
 		assertThat(retrieved).isNotNull();
@@ -76,7 +76,7 @@ public class ClientRepositoryTest {
 				.withCity("Shadaloo City").withZipcode("123456").build();
 		final Client saved = repo
 				.save(Client.ofType(PERSON).withFirstName("Ken").withLastName("Masters").withAddress(address).build());
-		Client retrieved = repo.findOne(saved.getId()).get();
+		Client retrieved = repo.findById(saved.getId()).get();
 		address = Address.from(address).withZipcode("654321").build();
 		retrieved = Client.from(retrieved).withEmail("kenm@email.com").withAddress(address).build();
 
@@ -97,7 +97,7 @@ public class ClientRepositoryTest {
 
 		// When
 		repo.delete(saved);
-		boolean exists = repo.exists(saved.getId());
+		boolean exists = repo.existsById(saved.getId());
 
 		// Then
 		assertThat(exists).isFalse();

@@ -92,7 +92,7 @@ public class ClientResourceIntegrationTest {
 		final Client client = Client.ofType(PERSON).withBirthDate(birthDate).build();
 		final ObjectId id = ObjectId.get();
 
-		given(repo.findOne(any(ObjectId.class))).willReturn(Optional.of(client));
+		given(repo.findById(any(ObjectId.class))).willReturn(Optional.of(client));
 
 		// Expect HTTP 200
 		mvc.perform(get(String.format("/clients/%s", id)).accept(APPLICATION_JSON_UTF8)).andExpect(status().isOk())
@@ -104,7 +104,7 @@ public class ClientResourceIntegrationTest {
 	@Test
 	public void shouldReturn404IfClientNotFound() throws Exception {
 
-		given(repo.findOne(any(ObjectId.class))).willReturn(Optional.empty());
+		given(repo.findById(any(ObjectId.class))).willReturn(Optional.empty());
 
 		// Expect HTTP 404
 		mvc.perform(get(String.format("/clients/%s", ObjectId.get())).accept(APPLICATION_JSON_UTF8))
@@ -160,7 +160,7 @@ public class ClientResourceIntegrationTest {
 	@Test
 	public void shouldNotAddClientIfClientAlreadyExists() throws Exception {
 
-		given(repo.exists(any(ObjectId.class))).willReturn(true);
+		given(repo.existsById(any(ObjectId.class))).willReturn(true);
 		final ObjectId id = ObjectId.get();
 
 		// Expect HTTP 400
@@ -172,7 +172,7 @@ public class ClientResourceIntegrationTest {
 	@Test
 	public void shouldUpdateAnExistingClient() throws Exception {
 
-		given(repo.exists(any(ObjectId.class))).willReturn(true);
+		given(repo.existsById(any(ObjectId.class))).willReturn(true);
 		given(repo.save(any(Client.class))).willReturn(Client.ofType(PERSON).build());
 
 		final ObjectId id = ObjectId.get();
@@ -187,7 +187,7 @@ public class ClientResourceIntegrationTest {
 	@Test
 	public void shouldFailUpdatingNonExistingClient() throws Exception {
 
-		given(repo.exists(any(ObjectId.class))).willReturn(false);
+		given(repo.existsById(any(ObjectId.class))).willReturn(false);
 
 		final ObjectId id = ObjectId.get();
 		final String UPDATE = String.format(
@@ -201,7 +201,7 @@ public class ClientResourceIntegrationTest {
 	@Test
 	public void shouldDeleteAnExistingClient() throws Exception {
 
-		given(repo.exists(any(ObjectId.class))).willReturn(true);
+		given(repo.existsById(any(ObjectId.class))).willReturn(true);
 
 		final ObjectId id = ObjectId.get();
 
@@ -212,7 +212,7 @@ public class ClientResourceIntegrationTest {
 	@Test
 	public void shouldDeleteExistingClientAndIgnoreFollowingCalls() throws Exception {
 
-		given(repo.exists(any(ObjectId.class))).willReturn(true).willReturn(false);
+		given(repo.existsById(any(ObjectId.class))).willReturn(true).willReturn(false);
 
 		final ObjectId id = ObjectId.get();
 
