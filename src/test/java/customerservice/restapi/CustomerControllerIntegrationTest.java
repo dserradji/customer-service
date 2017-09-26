@@ -57,7 +57,7 @@ public class CustomerControllerIntegrationTest {
 	 * Disable Spring Security OAuth2 authentication.
 	 * 
 	 */
-	@Order(SecurityProperties.ACCESS_OVERRIDE_ORDER)
+	//@Order(SecurityProperties.IGNORED_ORDER)
 	@Configuration
 	static class CustomWebSecurityConfigurer extends WebSecurityConfigurerAdapter {
 
