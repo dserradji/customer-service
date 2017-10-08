@@ -39,12 +39,19 @@ public class CustomerRepositoryTest {
 	public void shouldCreateAPerson() {
 
 		// Given
-		final Address address = Address.ofCountry("Shadaloo").withStreetNumber(110).withStreetName("Bison street")
-				.withCity("Shadaloo City").withZipcode("123456").build();
+		final Address address = Address.ofCountry("Shadaloo")
+				.withStreetNumber(110)
+				.withStreetName("Bison street")
+				.withCity("Shadaloo City")
+				.withZipcode("123456")
+				.build();
 
 		// When
-		final Customer saved = repo
-				.save(Customer.ofType(PERSON).withFirstName("Ken").withLastName("Masters").withAddress(address).build());
+		final Customer saved = repo.save(Customer.ofType(PERSON)
+				.withFirstName("Ken")
+				.withLastName("Masters")
+				.withAddress(address)
+				.build());
 
 		// Then
 		assertThat(saved.getId()).isNotNull();
@@ -56,10 +63,17 @@ public class CustomerRepositoryTest {
 	public void shouldFindAPersonWithItsId() {
 
 		// Given
-		final Address address = Address.ofCountry("Shadaloo").withStreetNumber(110).withStreetName("Bison street")
-				.withCity("Shadaloo City").withZipcode("123456").build();
-		final Customer saved = repo
-				.save(Customer.ofType(PERSON).withFirstName("Ken").withLastName("Masters").withAddress(address).build());
+		final Address address = Address.ofCountry("Shadaloo")
+				.withStreetNumber(110)
+				.withStreetName("Bison street")
+				.withCity("Shadaloo City")
+				.withZipcode("123456")
+				.build();
+		final Customer saved = repo.save(Customer.ofType(PERSON)
+				.withFirstName("Ken")
+				.withLastName("Masters")
+				.withAddress(address)
+				.build());
 
 		// When
 		final Customer retrieved = repo.findById(saved.getId()).get();
@@ -75,13 +89,24 @@ public class CustomerRepositoryTest {
 	public void shouldUpdateAPerson() {
 
 		// Given
-		Address address = Address.ofCountry("Shadaloo").withStreetNumber(110).withStreetName("Bison street")
-				.withCity("Shadaloo City").withZipcode("123456").build();
-		final Customer saved = repo
-				.save(Customer.ofType(PERSON).withFirstName("Ken").withLastName("Masters").withAddress(address).build());
+		Address address = Address.ofCountry("Shadaloo")
+				.withStreetNumber(110)
+				.withStreetName("Bison street")
+				.withCity("Shadaloo City")
+				.withZipcode("123456")
+				.build();
+		final Customer saved = repo.save(Customer.ofType(PERSON)
+				.withFirstName("Ken")
+				.withLastName("Masters")
+				.withAddress(address)
+				.build());
 		Customer retrieved = repo.findById(saved.getId()).get();
+		
 		address = Address.from(address).withZipcode("654321").build();
-		retrieved = Customer.from(retrieved).withEmail("kenm@email.com").withAddress(address).build();
+		retrieved = Customer.from(retrieved)
+				.withEmail("kenm@email.com")
+				.withAddress(address)
+				.build();
 
 		// When
 		final Customer updated = repo.save(retrieved);
@@ -96,7 +121,10 @@ public class CustomerRepositoryTest {
 	public void shouldDeleteAPerson() {
 
 		// Given
-		final Customer saved = repo.save(Customer.ofType(PERSON).withFirstName("Ken").withLastName("Masters").build());
+		final Customer saved = repo.save(Customer.ofType(PERSON)
+				.withFirstName("Ken")
+				.withLastName("Masters")
+				.build());
 
 		// When
 		repo.delete(saved);
@@ -110,10 +138,22 @@ public class CustomerRepositoryTest {
 	public void shouldReturnAllCustomers() {
 
 		// Given
-		final Address address = Address.ofCountry("Shadaloo").withStreetNumber(110).withStreetName("Bison street")
-				.withCity("Shadaloo City").withZipcode("123456").build();
-		repo.save(Customer.ofType(PERSON).withFirstName("Ken").withLastName("Masters").withAddress(address).build());
-		repo.save(Customer.ofType(COMPANY).withFirstName("Ken").withLastName("Masters").withAddress(address).build());
+		final Address address = Address.ofCountry("Shadaloo")
+				.withStreetNumber(110)
+				.withStreetName("Bison street")
+				.withCity("Shadaloo City")
+				.withZipcode("123456")
+				.build();
+		repo.save(Customer.ofType(PERSON)
+				.withFirstName("Ken")
+				.withLastName("Masters")
+				.withAddress(address)
+				.build());
+		repo.save(Customer.ofType(COMPANY)
+				.withFirstName("Ken")
+				.withLastName("Masters")
+				.withAddress(address)
+				.build());
 
 		// When
 		final Iterable<Customer> customers = repo.findAll();

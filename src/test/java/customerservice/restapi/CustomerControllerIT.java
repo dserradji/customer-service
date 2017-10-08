@@ -29,12 +29,10 @@ import org.bson.types.ObjectId;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.test.context.ContextConfiguration;
@@ -51,13 +49,12 @@ import customerservice.restapi.CustomerController;
 @WebMvcTest(controllers = { CustomerController.class })
 @ContextConfiguration(classes = { CustomerServiceExceptionHandler.class })
 @ComponentScan
-public class CustomerControllerIntegrationTest {
+public class CustomerControllerIT {
 
 	/**
 	 * Disable Spring Security OAuth2 authentication.
 	 * 
 	 */
-	//@Order(SecurityProperties.IGNORED_ORDER)
 	@Configuration
 	static class CustomWebSecurityConfigurer extends WebSecurityConfigurerAdapter {
 
@@ -113,7 +110,16 @@ public class CustomerControllerIntegrationTest {
 	}
 
 	@Test
-	public void shouldReturnEmptyBodyWhenNoCustomers() throws Exception {
+	public void shouldReturn400WhenFindingCustomerWithInvalidObjectId() throws Exception {
+
+		// Expect HTTP 400
+		mvc.perform(get("/customers/invalid_ObjectId").accept(APPLICATION_JSON_UTF8))
+			.andExpect(status().isBadRequest())
+			.andExpect(content().string(""));
+	}
+
+	@Test
+	public void shouldReturnEmptyBodyWhenNoCustomersFound() throws Exception {
 
 		given(repo.findAll()).willReturn(Collections.emptyList());
 
@@ -149,13 +155,13 @@ public class CustomerControllerIntegrationTest {
 	}
 
 	@Test
-	public void shouldNotAddCustomerIfContentIsNotValid() throws Exception {
+	public void shouldNotAddCustomerIfPayloadIsNotValid() throws Exception {
 
-		final String BAD_JSON = "{\"customer_type_is_missing\":\"PERSON\"}";
+		final String BAD_JSON = "{\"mandatory_customer_type_is_missing\":\"PERSON\"}";
 
 		// Expect HTTP 400
 		mvc.perform(post("/customers").contentType(APPLICATION_JSON_UTF8).content(BAD_JSON))
-				.andExpect(status().isBadRequest());
+			.andExpect(status().isBadRequest());
 	}
 
 	@Test

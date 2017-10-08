@@ -65,9 +65,9 @@ public class CustomerController {
 	 */
 	@PreAuthorize("#oauth2.hasAnyScope('read','write','read-write')")
 	@RequestMapping(method = GET, value = "/{id}")
-	public ResponseEntity<?> oneCustomer(@PathVariable @NotNull ObjectId id) {
+	public ResponseEntity<?> oneCustomer(@PathVariable ObjectId id) {
 
-		return repo.findById(id).map(customer -> ok(customer)).orElse(notFound().build());
+		return repo.findById(id).map(ResponseEntity::ok).orElse(notFound().build());
 	}
 
 	/**

@@ -46,7 +46,9 @@ public class CustomerControllerTest {
 	public void shouldReturnAllCustomers() {
 
 		// Given
-		final List<Customer> customers = asList(Customer.ofType(PERSON).build(), Customer.ofType(COMPANY).build());
+		final List<Customer> customers = asList(
+				Customer.ofType(PERSON).build(), 
+				Customer.ofType(COMPANY).build());
 		when(repo.findAll()).thenReturn(customers);
 
 		// When
@@ -129,8 +131,9 @@ public class CustomerControllerTest {
 
 		// When
 		// Then
-		assertThatThrownBy(() -> controller.addCustomer(customer)).isInstanceOf(CustomerServiceException.class)
-				.hasMessageContaining("Customer already exists");
+		assertThatThrownBy(() -> controller.addCustomer(customer))
+			.isInstanceOf(CustomerServiceException.class)
+			.hasMessageContaining("Customer already exists");
 	}
 
 	@Test
@@ -162,7 +165,8 @@ public class CustomerControllerTest {
 		// When
 		// Then
 		assertThatThrownBy(() -> controller.updateCustomer(newCustomer.getId(), newCustomer))
-				.isInstanceOf(CustomerServiceException.class).hasMessageContaining("Customer does not exist");
+			.isInstanceOf(CustomerServiceException.class)
+			.hasMessageContaining("Customer does not exist");
 	}
 
 	@Test

@@ -15,7 +15,10 @@ public class AddressTest {
 		final Address address;
 
 		// When
-		address = Address.ofCountry("Shadaloo").withStreetNumber(110).withStreetName("Bison street").withCity("Shadaloo City")
+		address = Address.ofCountry("Shadaloo")
+				.withStreetNumber(110)
+				.withStreetName("Bison street")
+				.withCity("Shadaloo City")
 				.withZipcode("123456").build();
 
 		// Then
@@ -32,8 +35,12 @@ public class AddressTest {
 	public void shouldUpdateAnAddress() {
 
 		// Given
-		Address address = Address.ofCountry("Shadaloo").withStreetNumber(110).withStreetName("Bison street")
-				.withCity("Shadaloo City").withZipcode("123456").build();
+		Address address = Address.ofCountry("Shadaloo")
+				.withStreetNumber(110)
+				.withStreetName("Bison street")
+				.withCity("Shadaloo City")
+				.withZipcode("123456")
+				.build();
 
 		// When
 		address = Address.from(address).withStreetNumber(2000).build();
@@ -51,6 +58,7 @@ public class AddressTest {
 	@Test
 	public void shouldFailIfCountryIsNull() {
 
-		assertThatThrownBy(() -> Address.ofCountry(null)).hasMessage("Country can not be null.");
+		assertThatThrownBy(() -> Address.ofCountry(null))
+			.hasMessage("Country can not be null.");
 	}
 }

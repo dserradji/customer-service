@@ -94,10 +94,13 @@ public final class Customer {
 		return customerType;
 	}
 
+	/**
+	 * Returns a copy of the phones list, we don't want the reference to escape.
+	 * 
+	 * @return A copy of the phones list
+	 */
 	public Map<PhoneType, String> getPhones() {
-		final Map<PhoneType, String> copie = new HashMap<>();
-		phones.forEach((key, value) -> copie.put(key, value));
-		return copie;
+		return new HashMap<>(phones);
 	}
 
 	public String getEmail() {
